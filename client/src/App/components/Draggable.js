@@ -10,10 +10,8 @@ class Draggable extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            leftOffset: 0,
-            topOffset: 0,
-            left: 0,
-            top: 0,
+            offsetX: 0,
+            offsetY: 0,
             clicked: false,
             dragging: false,
         }
@@ -27,33 +25,36 @@ class Draggable extends Component {
     componentDidMount() {
         const imgs = this.sourceElem.getElementsByTagName('IMG');
         for (let i = 0; i < imgs.length; ++i) {
-          imgs[i].setAttribute('draggable', 'false');
+            imgs[i].setAttribute('draggable', 'false');
         }
+
+        const rect = this.sourceElem.getBoundingClientRect();
+        this.setState({
+            offsetX: rect.width / 2,
+            offsetY: rect.height / 2
+        });
 
         this.addListeners(this.sourceElem);
     }
 
     addListeners = (element) => {
-        element.addEventListener('mousedown', (e) => { this.handleMouseDown(e); });
+        element.addEventListener('mousedown', (e) => { this.handleMouseDown(e); }, false);
     };
-
-
-
+    
     handleMouseDown = (e) => {
         if(usesLeftButton(e))
         {
             console.log('down');            
+            this.dragElem = this.sourceElem.cloneNode(true);
             document.addEventListener('mousemove', this.handleMouseMove);
             document.addEventListener('mouseup', this.handleMouseUp);
             this.startDrag(e.clientX, e.clientY);
         }
     }
 
-    startDrag = (clientX, clientY) => {
-        this.dragElem = this.sourceElem.cloneNode(true);
-        const rect = this.sourceElem.getBoundingClientRect();
-        const fixedX = clientX - (rect.width / 2);
-        const fixedY = clientY - (rect.height / 2);
+    startDrag = (x, y) => {
+        const fixedX = x - this.state.offsetX;
+        const fixedY = y - this.state.offsetY;
         
         this.dragElem.setAttribute('style', `
             position:absolute;
@@ -66,35 +67,52 @@ class Draggable extends Component {
     } 
 
     handleMouseMove = (e) => {
-        e.preventDefault();
         if (this.state.clicked) {
-            this.moveDrag(e.clientX, e.clientY);
+            console.log('move');
             window.getSelection().removeAllRanges();
+            this.moveDrag(e.clientX, e.clientY);
         }
     }
 
     moveDrag = (x, y) => {
+        const fixedX = x - this.state.offsetX;
+        const fixedY = y - this.state.offsetY;
+
+        this.dragElem.style.left = fixedX;
+        this.dragElem.style.top = fixedY;
+        
         this.setState({dragging: true});        
-        
-        
     } 
 
     handleMouseUp = (e) => {
-        this.setState({ clicked: false });
         if (this.state.dragging) {
+            console.log('up');
+
+            e.preventDefault();
             document.removeEventListener('mousemove', this.handleMouseMove);
             document.removeEventListener('mouseup', this.handleMouseUp);
-            this.endDrag(e.clientX, e.clientY);
             window.getSelection().removeAllRanges();
+            this.endDrag(e.clientX, e.clientY);
         }
     }
 
     endDrag = (x ,y) => {
+        const fixedX = x - this.state.offsetX;
+        const fixedY = y - this.state.offsetY;
+
+        this.dragElem.style.left = fixedX;
+        this.dragElem.style.top = fixedY;
+        
         document.body.removeChild(this.dragElem);
+        this.setState({ 
+            clicked: false,
+            dragging: false 
+        });
     }
 
     render() {
         const content = this.props.children;
+
         return (
             <div ref={(c) => {this.sourceElem = c;}}>
                 {content}                    
