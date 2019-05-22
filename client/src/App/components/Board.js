@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import styled from 'styled-components'
 import tileImg from '../resources/tile.jpg'
-import { thisTypeAnnotation } from '@babel/types';
+import DropZone from './DropZone';
 
 const Main = styled.div`
     position: absolute;
@@ -21,7 +21,8 @@ const Background = styled.div`
 
 class Board extends Component {
     state = {
-        body: [],
+        background: [],
+        items: [],
         width: 0,
         height: 0,        
     }
@@ -33,9 +34,9 @@ class Board extends Component {
         const col = this.props.col;
 
         this.setState({
-            body: [
-                ...this.state.body,
-                <Tile width={offsetW} height={offsetH} row={row} col={col} /> 
+            background: [
+                ...this.state.background,
+                <Tile width={offsetW} height={offsetH} row={row} col={col} key={0}/> 
             ],
             width: col * offsetW,
             height: row * offsetH,
@@ -63,15 +64,18 @@ class Board extends Component {
 
         return (  
             <Main width={boardWidth} height={boardHeight}>
-                {this.state.body}
-            </Main>      
+                {this.state.background}
+                <DropZone >
+                    {this.state.items}
+                </DropZone>
+            </Main>            
         );
     }
 }
 
 class Tile extends Component {
     state = {
-        body: [],
+        tiles: [],
         offsetWidth: this.props.width,
         offsetHeihgt: this.props.height,
         row: this.props.row,
@@ -95,13 +99,13 @@ class Tile extends Component {
             }
             temp.push(<br />);
         }
-        this.setState({ body: temp });
+        this.setState({ tiles: temp });
     }
 
     render() {
         return (
             <Background>
-                {this.state.body}
+                {this.state.tiles}
             </Background>
         );
     }
