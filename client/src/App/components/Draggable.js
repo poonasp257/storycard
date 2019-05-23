@@ -1,9 +1,24 @@
 import React, { Component } from 'react';
-import styled from 'styled-components';
 
 function usesLeftButton(e) {
     const button = e.buttons || e.which || e.button;
     return button === 1;
+}
+
+function getFixedOffset() {
+    // When browser window is zoomed, IOS browsers will offset "location:fixed" component coordinates
+    // from the actual window coordinates
+    let fixedElem = document.createElement('div');
+    fixedElem.style.cssText = 'position:fixed; top: 0; left: 0';
+    document.body.appendChild(fixedElem);
+    const rect = fixedElem.getBoundingClientRect();
+    document.body.removeChild(fixedElem);
+    return [rect.left, rect.top];
+}
+
+function isZoomed() {
+    // somewhat arbitrary figure to decide whether we need to use getFixedOffset (above) or not
+    return Math.abs(1 - (document.body.clientWidth / window.innerWidth)) > 0.02;
 }
 
 class Draggable extends Component {
@@ -18,8 +33,6 @@ class Draggable extends Component {
 
         this.sourceElem = null;
         this.dragElem = null;
-        this.currentTarget = null;
-        this.prevTarget = null;
     }    
 
     componentDidMount() {
@@ -30,12 +43,19 @@ class Draggable extends Component {
 
         const rect = this.sourceElem.getBoundingClientRect();
         this.setState({
-            offsetX: rect.width / 2,
-            offsetY: rect.height / 2
+            offsetX: rect.width * 0.5,
+            offsetY: rect.height * 0.5
         });
 
         this.addListeners(this.sourceElem);
+
     }
+
+    setFixedOffset = () => {
+        if (isZoomed()) {
+            [this.fixedOffsetLeft, this.fixedOffsetTop] = getFixedOffset();
+        }
+    };
 
     addListeners = (element) => {
         element.addEventListener('mousedown', (e) => { this.handleMouseDown(e); }, false);
@@ -43,9 +63,7 @@ class Draggable extends Component {
     
     handleMouseDown = (e) => {
         if(usesLeftButton(e))
-        {
-            console.log('down');            
-            this.dragElem = this.sourceElem.cloneNode(true);
+        {           
             document.addEventListener('mousemove', this.handleMouseMove);
             document.addEventListener('mouseup', this.handleMouseUp);
             this.startDrag(e.clientX, e.clientY);
@@ -56,19 +74,19 @@ class Draggable extends Component {
         const fixedX = x - this.state.offsetX;
         const fixedY = y - this.state.offsetY;
         
+        this.dragElem = this.sourceElem.cloneNode(true);
         this.dragElem.setAttribute('style', `
             position:absolute;
             left: ${fixedX}px;
             top: ${fixedY}px;
-            border: solid;
         `);
+        
         document.body.appendChild(this.dragElem);
         this.setState({ clicked: true });
     } 
 
     handleMouseMove = (e) => {
         if (this.state.clicked) {
-            console.log('move');
             window.getSelection().removeAllRanges();
             this.moveDrag(e.clientX, e.clientY);
         }
@@ -78,36 +96,42 @@ class Draggable extends Component {
         const fixedX = x - this.state.offsetX;
         const fixedY = y - this.state.offsetY;
 
-        this.dragElem.style.left = fixedX;
-        this.dragElem.style.top = fixedY;
+        this.dragElem.setAttribute('style', `
+            position:absolute;
+            left: ${fixedX}px;
+            top: ${fixedY}px;
+        `);
+        console.log(this.dragElem.style.left + ' : ' + this.dragElem.style.top)
         
         this.setState({dragging: true});        
     } 
 
     handleMouseUp = (e) => {
-        if (this.state.dragging) {
-            console.log('up');
-
             e.preventDefault();
             document.removeEventListener('mousemove', this.handleMouseMove);
             document.removeEventListener('mouseup', this.handleMouseUp);
             window.getSelection().removeAllRanges();
             this.endDrag(e.clientX, e.clientY);
-        }
     }
 
     endDrag = (x ,y) => {
         const fixedX = x - this.state.offsetX;
         const fixedY = y - this.state.offsetY;
 
-        this.dragElem.style.left = fixedX;
-        this.dragElem.style.top = fixedY;
+        this.dragElem.setAttribute('style', `
+            position:absolute;
+            left: ${fixedX}px;
+            top: ${fixedY}px;
+        `);
+
+        console.log(this.dragElem.style.left + ' : ' + this.dragElem.style.top)
         
         document.body.removeChild(this.dragElem);
         this.setState({ 
             clicked: false,
-            dragging: false 
+            dragging: false
         });
+        this.props.setContainer(this.dragElem);
     }
 
     render() {
@@ -115,7 +139,7 @@ class Draggable extends Component {
 
         return (
             <div ref={(c) => {this.sourceElem = c;}}>
-                {content}                    
+                {content}         
             </div>
         );
     }
@@ -132,23 +156,3 @@ Draggable.defaultProps = {
   };
 
 export default Draggable;
-
-/*
-
-    setCurrentTarget = (x, y) => {
-        const target = document.elementFromPoint(x, y) || document.body;
-        this.dragElem.style.zIndex = this.props.zIndex;
-        // prevent it from selecting itself as the target
-        this.currentTarget = this.dragElem.contains(target) ? document.body : target;
-    };
-
-    
-
-    drag = (x, y) => {     
-        
-    };
-
-    drop = (clientX, clientY) => {
-        this.setState({ dragging: false });
-    }
-*/

@@ -12,8 +12,8 @@ class Symbol extends Component {
     render() {
         return ( 
             <Container>
-                <Draggable target={this.props.target}> 
-                    <img src={this.props.image} width="70px"/>
+                <Draggable setContainer={this.props.setContainer}> 
+                    <img src={this.props.image} width="70px" alt="symbol"/>
                 </Draggable>
             </Container>
         );

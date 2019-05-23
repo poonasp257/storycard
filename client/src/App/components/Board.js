@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import ReactDOMServer from 'react-dom/server'
 import styled from 'styled-components'
 import tileImg from '../resources/tile.jpg'
 import DropZone from './DropZone';
@@ -22,7 +23,6 @@ const Background = styled.div`
 class Board extends Component {
     state = {
         background: [],
-        items: [],
         width: 0,
         height: 0,        
     }
@@ -45,33 +45,42 @@ class Board extends Component {
         this.GetObjects();
     }
     
+    // lib
+    ConvertToHTML = (elements) => {
+        let html = '';
+        elements.map((element) => {
+            html += element.outerHTML;
+        })
+
+        return html;
+    }
+
     GetObjects = async () => {
         const objects = await this.CallApi();
-        this.setState ({
-            ...this.state
-        })
+        //this.props.setContainer(objects);
     }
 
     CallApi = () => {
-        return(
-            console.log('call api')
-        );
     }
 
     render() {
         const boardWidth = this.state.width + 'px';
         const boardHeight = this.state.height + 'px';
 
+        let items = this.ConvertToHTML(this.props.container);
+        
         return (  
             <Main width={boardWidth} height={boardHeight}>
                 {this.state.background}
-                <DropZone >
-                    {this.state.items}
-                </DropZone>
+                <DropZone>
+                    <div dangerouslySetInnerHTML={{__html: items}} />
+                </DropZone>                
             </Main>            
         );
     }
 }
+
+// dangerouslySetInnerHTML={{__html: items}}
 
 class Tile extends Component {
     state = {
@@ -90,14 +99,10 @@ class Tile extends Component {
         let temp = [];
         const offsetW  = this.state.offsetWidth;
         const offsetH  = this.state.offsetHeihgt; 
-        const row = this.state.row;
-        const col = this.state.col;
+        const size = this.state.row * this.state.col;
 
-        for(let i = 0; i < row; ++i) {
-            for(let j = 0; j < col; ++j) {
-                temp.push(<img src={tileImg} width={offsetW} height={offsetH} />);
-            }
-            temp.push(<br />);
+        for(let i = 0; i < size; ++i) {
+            temp.push(<img src={tileImg} width={offsetW} height={offsetH} key={i} alt="tile" draggable="false" />);
         }
         this.setState({ tiles: temp });
     }

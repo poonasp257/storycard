@@ -20,15 +20,22 @@ class App extends Component {
     container: []
   }
 
-  componentDidMount() {
-    console.log(this.state.container)
+  setContainer = (element) => {
+    this.setState({
+      container: [
+        ...this.state.container,
+        element
+      ]
+    })
   }
 
   render() {
     let symbols = [];
-          
+
+    console.log(this.state.container);
+
     for(let key in ImageLoader) {
-      symbols.push(<Symbol image={ImageLoader[key]} target={this.state.container} />)
+      symbols.push(<Symbol image={ImageLoader[key]} setContainer={this.setContainer} key={key}/>)
     }
 
     return (      
@@ -36,7 +43,7 @@ class App extends Component {
         <Symbols>
           {symbols}
         </Symbols>
-        <Board row={15} col={20} target={this.state.container} />
+        <Board row={15} col={20} setContainer={this.setContainer} container={this.state.container} />
       </div>
     );
   }
