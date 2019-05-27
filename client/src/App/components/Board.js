@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import ReactDOMServer from 'react-dom/server'
 import styled from 'styled-components'
 import tileImg from '../resources/tile.jpg'
 import DropZone from './DropZone';
@@ -11,7 +10,7 @@ const Main = styled.div`
     width: ${props => props.width};
     height: ${props => props.height};
     border: solid;
-    border-width: 1px;
+    border-width: 2px;
     box-shadow: 5px 5px 8px 4px rgba(0, 0, 0, 0.5);
 `;
 
@@ -44,12 +43,12 @@ class Board extends Component {
         
         this.GetObjects();
     }
-    
-    // lib
+     
     ConvertToHTML = (elements) => {
         let html = '';
         elements.map((element) => {
-            html += element.outerHTML;
+            return (
+                html += element.outerHTML);
         })
 
         return html;
@@ -62,25 +61,30 @@ class Board extends Component {
 
     CallApi = () => {
     }
-
+    
     render() {
         const boardWidth = this.state.width + 'px';
         const boardHeight = this.state.height + 'px';
 
         let items = this.ConvertToHTML(this.props.container);
         
+        const rect  = {
+            left: 50,
+            top: 50,
+            width: 1000,
+            height: 750
+        };
+
         return (  
-            <Main width={boardWidth} height={boardHeight}>
-                {this.state.background}
-                <DropZone>
-                    <div dangerouslySetInnerHTML={{__html: items}} />
-                </DropZone>                
-            </Main>            
+            <DropZone tag="board" rect={rect}>
+                <Main width={boardWidth} height={boardHeight}>
+                    {this.state.background}
+                </Main>
+                <div dangerouslySetInnerHTML={{ __html: items }} />
+            </DropZone>
         );
     }
 }
-
-// dangerouslySetInnerHTML={{__html: items}}
 
 class Tile extends Component {
     state = {
