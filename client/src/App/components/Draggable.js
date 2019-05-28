@@ -39,13 +39,13 @@ class Draggable extends Component {
         this.fixedY = y - (this.offsetY * 0.5);
 
         this.dragElem.setAttribute('style', `
-        position:absolute;
-        width: ${this.offsetX}px;
-        height: ${this.offsetY}px;
-        left: ${this.fixedX}px;
-        top: ${this.fixedY}px;
-        right: ${this.fixedX + this.offsetX}px;
-        bottom: ${this.fixedY + this.offsetY}px;
+            position:absolute;
+            width: ${this.offsetX}px;
+            height: ${this.offsetY}px;
+            left: ${this.fixedX}px;
+            top: ${this.fixedY}px;
+            right: ${this.fixedX + this.offsetX}px;
+            bottom: ${this.fixedY + this.offsetY}px;
         `);
     };
 
@@ -101,8 +101,7 @@ class Draggable extends Component {
 
     startDrag = (x, y) => {
         this.dragElem = this.sourceElem.cloneNode(true);
-        this.fixPositon(x, y);
-
+        this.fixPositon(x, y);        
         document.body.appendChild(this.dragElem);
         this.setState({ clicked: true });
     }
@@ -150,7 +149,7 @@ class Draggable extends Component {
                     if(this.Overlap(rect, dragRect)) return false;
                 }
 
-                this.props.setContainer(this.dragElem);
+                this.props.addItem(this.dragElem);
             }
 
             return true;

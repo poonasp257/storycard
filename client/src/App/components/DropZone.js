@@ -10,8 +10,8 @@ class DropZone extends React.Component {
       width: this.props.rect.width,
       height: this.props.rect.height
     };
-
-    return(
+    
+    return (
       <div className={this.props.tag} style={style}>
         {content}
       </div>

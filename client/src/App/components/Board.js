@@ -49,7 +49,7 @@ class Board extends Component {
         
         this.GetObjects();
     }
-     
+
     ConvertToHTML = (elements) => {
         let html = '';
         elements.map((element) => {
@@ -69,14 +69,14 @@ class Board extends Component {
     }
     
     render() {
-        let items = this.ConvertToHTML(this.props.container);
+        let items = this.ConvertToHTML(this.props.items);
 
         const rect  = {
             left: 50,
             top: 50,
             width: this.state.width,
             height: this.state.height
-        };
+        };        
 
         return (  
             <DropZone tag="board" rect={rect}>

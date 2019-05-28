@@ -8,7 +8,7 @@ const Content = styled.img`
 class Symbol extends Component {
     render() {
         return (
-            <Draggable tag="board" setContainer={this.props.setContainer}>
+            <Draggable tag="board" addItem={this.props.addItem}>
                 <Content src={this.props.image} alt="symbol" />
             </Draggable>
         );

@@ -27,41 +27,45 @@ class App extends Component {
     super();
 
     this.state = {
-      container: []
+      items: []
     };
   }
 
-  setContainer = (element) => {
+  addItem = (element) => {
     this.setState({
-      container: [
-        ...this.state.container,
+      items: [
+        ...this.state.items,
         element
       ]
     })
   }
 
-  down = (e) => {
-    let x = e.clientX;
-    let y = e.clientY;
-
-    console.log(document.elementFromPoint(x, y))
+  setItems = (elements) => {
+    this.setState({
+      items: elements
+    })
   }
-
+ 
   render() {
     let symbols = [];
 
     for(let key in ImageLoader) {
-      symbols.push(<Symbol image={ImageLoader[key]} setContainer={this.setContainer} key={key} />)
+      symbols.push(<Symbol image={ImageLoader[key]} addItem={this.addItem} key={key} />)
     }
 
+    let items = this.state.items;
+    for(let i = 0; i < items.length; ++i){
+      items[i].id = i; 
+    }
+    
     return (      
-      <Main onMouseDown={this.down}>
-        <Board row={15} col={20} setContainer={this.setContainer} container={this.state.container} />
+      <Main>
+        <Board row={15} col={20} setItems={this.setItems} items={this.state.items} />
         <Symbols>
           {symbols}
         </Symbols>
         <PostBox>
-          <PostIt setContainer={this.setContainer} />
+          <PostIt setItems={this.setItems} addItem={this.addItem} items={this.state.items} />
         </PostBox>
       </Main>
     );

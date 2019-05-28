@@ -11,27 +11,53 @@ const Content = styled.textarea`
     background-color: #BAECFF;
     font-size: 1.5em;
     resize: none;
-    overflow: hidden;
-    maxlength: 50;
 `;
 
 class PostIt extends Component {
     constructor(props) {
         super(props);
 
-        this.state = {
-            text: '',
-        };
+        this.items = null;
+        this.maxLength = 0;
     }
 
-    onChange = (event) => {
-        console.log('change');
+    componentWillReceiveProps(nextProps) {
+        this.items = nextProps.items;
+    }
+
+    componentDidUpdate() {
+        const board = document.getElementsByClassName('board');
+        const texts = board[0].getElementsByTagName('textarea');
+
+        for(let text of texts) {
+            text.removeAttribute('readOnly');
+            text.addEventListener('keydown', this.OnKeyDown);
+            text.addEventListener('change', this.OnChange);
+        }
+    }    
+
+    OnChange = (e) => {
+        this.items = this.props.items;
+        for(let item of this.items) {
+            if(item.id !== e.target.closest('div').id) continue;
+
+            let texts = item.getElementsByTagName('TEXTAREA');  
+            for(let text of texts) {
+                text.value = e.target.value;
+                text.innerHTML = e.target.value;
+                console.log(text.value.length)
+            }
+        }
+
+        this.props.setItems(this.items);
     }
     
     render() {
         return (
-            <Draggable tag="board" setContainer={this.props.setContainer}>   
-                <Content value={this.state.text} onChange={this.onChange}> </Content>
+            <Draggable tag="board" addItem={this.props.addItem} customEvent={this.OnChange}>   
+                <form>
+                    <Content readOnly onChange={this.OnChange} />
+                </form>
             </Draggable>
         );
     }
