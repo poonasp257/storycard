@@ -5,10 +5,10 @@ import DropZone from './DropZone';
 
 const Main = styled.div`
     position: absolute;
-    top: 50px;
-    left: 50px;
-    width: ${props => props.width};
-    height: ${props => props.height};
+    top: ${props => props.rect.top}px;
+    left: ${props => props.rect.left}px;
+    width: ${props => props.rect.width}px;
+    height: ${props => props.rect.height}px;
     border: solid;
     border-width: 2px;
     box-shadow: 5px 5px 8px 4px rgba(0, 0, 0, 0.5);
@@ -20,10 +20,16 @@ const Background = styled.div`
 `;
 
 class Board extends Component {
-    state = {
-        background: [],
-        width: 0,
-        height: 0,        
+    constructor(props) {
+        super(props);
+
+        this.state= {
+            background: [],
+            left: 0,
+            top: 0,
+            width: 0,
+            height: 0,
+        }
     }
 
     componentWillMount() {        
@@ -63,21 +69,18 @@ class Board extends Component {
     }
     
     render() {
-        const boardWidth = this.state.width + 'px';
-        const boardHeight = this.state.height + 'px';
-
         let items = this.ConvertToHTML(this.props.container);
-        
+
         const rect  = {
             left: 50,
             top: 50,
-            width: 1000,
-            height: 750
+            width: this.state.width,
+            height: this.state.height
         };
 
         return (  
             <DropZone tag="board" rect={rect}>
-                <Main width={boardWidth} height={boardHeight}>
+                <Main rect={rect}>
                     {this.state.background}
                 </Main>
                 <div dangerouslySetInnerHTML={{ __html: items }} />

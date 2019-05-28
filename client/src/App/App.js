@@ -40,6 +40,13 @@ class App extends Component {
     })
   }
 
+  down = (e) => {
+    let x = e.clientX;
+    let y = e.clientY;
+
+    console.log(document.elementFromPoint(x, y))
+  }
+
   render() {
     let symbols = [];
 
@@ -48,7 +55,7 @@ class App extends Component {
     }
 
     return (      
-      <Main>
+      <Main onMouseDown={this.down}>
         <Board row={15} col={20} setContainer={this.setContainer} container={this.state.container} />
         <Symbols>
           {symbols}

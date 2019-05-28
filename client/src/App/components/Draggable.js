@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
-import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
-import { objectTypeSpreadProperty } from '@babel/types';
 
 function usesLeftButton(e) {
     const button = e.buttons || e.which || e.button;
@@ -42,13 +40,16 @@ class Draggable extends Component {
 
         this.dragElem.setAttribute('style', `
         position:absolute;
+        width: ${this.offsetX}px;
+        height: ${this.offsetY}px;
         left: ${this.fixedX}px;
         top: ${this.fixedY}px;
+        right: ${this.fixedX + this.offsetX}px;
+        bottom: ${this.fixedY + this.offsetY}px;
         `);
     };
 
-    GetTarget = (tag) => {
-        const targets = document.getElementsByClassName(tag);
+    GetRects = (targets) => {
         return (
             Object.keys(targets).map((key) => {
                 const width = parseInt(targets[key].style["width"]);
@@ -129,7 +130,8 @@ class Draggable extends Component {
     endDrag = (x, y) => {
         this.fixPositon(x, y);
 
-        const targets = this.GetTarget(this.props.tag);
+        const targets = document.getElementsByClassName(this.props.tag);
+        const targetRects = this.GetRects(targets);
         const dragRect = {
             width: this.offsetX,
             height: this.offsetY,
@@ -139,15 +141,21 @@ class Draggable extends Component {
             bottom: this.fixedY + this.offsetY
         };
 
-        Object.keys(targets).map((key) => {
-            if (this.IsContaining(targets[key], dragRect)) {
+        Object.keys(targetRects).map((i) => {
+            if (this.IsContaining(targetRects[i], dragRect)) {
+                const otherObj = targets[i].getElementsByClassName("draggable");
+                const objRects = this.GetRects(otherObj);
+
+                for(let rect of objRects) {
+                    if(this.Overlap(rect, dragRect)) return false;
+                }
+
                 this.props.setContainer(this.dragElem);
             }
-            if (this.Overlap(targets[key], dragRect)) {
-                console.log('overlap')
-            }
-        })
 
+            return true;
+        });
+        
         document.body.removeChild(this.dragElem);
         this.setState({
             clicked: false,
@@ -157,9 +165,8 @@ class Draggable extends Component {
 
     render() {
         const content = this.props.children;
-
         return (
-            <div ref={(c) => { this.sourceElem = c; }}>
+            <div ref={(c) => { this.sourceElem = c; }} className="draggable">
                 {content}
             </div>
         );
