@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import styled from 'styled-components'
-import tileImg from '../resources/tile.jpg'
+import styled from 'styled-components';
+import tileImg from '../resources/tile.jpg';
 import DropZone from './DropZone';
 
 const Main = styled.div`
@@ -61,7 +61,7 @@ class Board extends Component {
     }
 
     GetObjects = async () => {
-        const objects = await this.CallApi();
+        //const objects = await this.CallApi();
         //this.props.setContainer(objects);
     }
 

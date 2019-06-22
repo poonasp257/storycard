@@ -12,44 +12,33 @@ const Content = styled.textarea`
     font-size: 1.5em;
     resize: none;
 `;
-
+// stateless type으로 변경 예정
+// onchange 방식 바꾼 후 componentDidUpdate 부분 삭제
 class PostIt extends Component {
-    constructor(props) {
-        super(props);
-
-        this.items = null;
-        this.maxLength = 0;
-    }
-
-    componentWillReceiveProps(nextProps) {
-        this.items = nextProps.items;
-    }
-
     componentDidUpdate() {
         const board = document.getElementsByClassName('board');
         const texts = board[0].getElementsByTagName('textarea');
 
         for(let text of texts) {
             text.removeAttribute('readOnly');
-            text.addEventListener('keydown', this.OnKeyDown);
             text.addEventListener('change', this.OnChange);
+            //text.addEventListener('keydown', this.OnKeyDown);
         }
     }    
 
     OnChange = (e) => {
-        this.items = this.props.items;
-        for(let item of this.items) {
+        let items = Object.assign({}, this.props.items);
+        for(let item of items) {
             if(item.id !== e.target.closest('div').id) continue;
 
             let texts = item.getElementsByTagName('TEXTAREA');  
             for(let text of texts) {
                 text.value = e.target.value;
                 text.innerHTML = e.target.value;
-                console.log(text.value.length)
             }
+            break;
         }
-
-        this.props.setItems(this.items);
+        this.props.setItems(items);
     }
     
     render() {

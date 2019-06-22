@@ -1,18 +1,16 @@
-import React, { Component } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import Draggable from './Draggable';
 
 const Content = styled.img`
 `;
 
-class Symbol extends Component {
-    render() {
-        return (
-            <Draggable tag="board" addItem={this.props.addItem}>
-                <Content src={this.props.image} alt="symbol" />
-            </Draggable>
-        );
-    }
+function Symbol(props) {
+    return (
+    <Draggable tag="board" addItem={props.addItem}>
+        <Content src={props.image} alt="symbol" className={props.type}/>
+    </Draggable>
+    );
 }
 
 export default Symbol; 

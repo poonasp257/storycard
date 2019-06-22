@@ -1,22 +1,20 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-class DropZone extends React.Component {
-  render() {
-    const content = this.props.children;
+function DropZone(props) {
+    const content = props.children;
     const style = {
-      left: this.props.rect.left,
-      top: this.props.rect.top,
-      width: this.props.rect.width,
-      height: this.props.rect.height
+      left: props.rect.left,
+      top: props.rect.top,
+      width: props.rect.width,
+      height: props.rect.height
     };
     
     return (
-      <div className={this.props.tag} style={style}>
+      <div className={props.tag} style={style}>
         {content}
       </div>
     );
-  }  
 }
 
 DropZone.propTypes = {

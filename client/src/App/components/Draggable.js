@@ -27,7 +27,7 @@ class Draggable extends Component {
         for (let i = 0; i < imgs.length; ++i) {
             imgs[i].setAttribute('draggable', 'false');
         }
-
+        
         const rect = this.sourceElem.getBoundingClientRect();
         this.offsetX = rect.width;
         this.offsetY = rect.height;
@@ -35,18 +35,16 @@ class Draggable extends Component {
     }
 
     fixPositon = (x, y) => {
-        this.fixedX = x - (this.offsetX * 0.5);
-        this.fixedY = y - (this.offsetY * 0.5);
+        const rect = this.sourceElem.getBoundingClientRect();
+        this.offsetX = rect.width;
+        this.offsetY = rect.height;        
+        this.fixedX = x - (this.offsetX * 0.5) + window.scrollX;
+        this.fixedY = y - (this.offsetY * 0.5) + window.scrollY;
 
-        this.dragElem.setAttribute('style', `
-            position:absolute;
-            width: ${this.offsetX}px;
-            height: ${this.offsetY}px;
-            left: ${this.fixedX}px;
-            top: ${this.fixedY}px;
-            right: ${this.fixedX + this.offsetX}px;
-            bottom: ${this.fixedY + this.offsetY}px;
-        `);
+        this.dragElem.style["left"] = `${this.fixedX}px`;
+        this.dragElem.style["top"] = `${this.fixedY}px`;
+        this.dragElem.style["right"] = `${this.fixedX + this.offsetX}px`;
+        this.dragElem.style["bottom"] = `${this.fixedY + this.offsetY}px`;
     };
 
     GetRects = (targets) => {
@@ -100,7 +98,12 @@ class Draggable extends Component {
     }
 
     startDrag = (x, y) => {
-        this.dragElem = this.sourceElem.cloneNode(true);
+        this.dragElem = this.sourceElem.cloneNode(true);        
+        this.dragElem.setAttribute('style', `
+            position:absolute;
+            width: ${this.offsetX}px;
+            height: ${this.offsetY}px;
+        `);
         this.fixPositon(x, y);        
         document.body.appendChild(this.dragElem);
         this.setState({ clicked: true });

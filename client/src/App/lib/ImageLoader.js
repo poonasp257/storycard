@@ -4,8 +4,7 @@ import image03 from '../resources/symbol_3.png';
 import image04 from '../resources/symbol_4.png';
 
 export default {
-    image01,
-    image02,
-    image03,
-    image04
-};
+    A: [image01],
+    B: [image02],
+    C: [image03, image04],
+}; 
