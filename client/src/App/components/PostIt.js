@@ -3,8 +3,8 @@ import styled from 'styled-components';
 import Draggable from './Draggable';
 
 const Content = styled.textarea`
-    width: 200px;
-    height: 200px;
+    width: 160px;
+    height: 160px;
     border: solid;
     border-width: 1px;
     box-shadow: 5px 5px 8px 4px rgba(0, 0, 0, 0.5);
@@ -12,9 +12,16 @@ const Content = styled.textarea`
     font-size: 1.5em;
     resize: none;
 `;
-// stateless type으로 변경 예정
-// onchange 방식 바꾼 후 componentDidUpdate 부분 삭제
+
 class PostIt extends Component {
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            type: ''
+        }
+    }
+
     componentDidUpdate() {
         const board = document.getElementsByClassName('board');
         const texts = board[0].getElementsByTagName('textarea');
@@ -27,7 +34,9 @@ class PostIt extends Component {
     }    
 
     OnChange = (e) => {
-        let items = Object.assign({}, this.props.items);
+
+        let items = this.props.items.slice();
+        console.log(items);
         for(let item of items) {
             if(item.id !== e.target.closest('div').id) continue;
 
@@ -35,6 +44,9 @@ class PostIt extends Component {
             for(let text of texts) {
                 text.value = e.target.value;
                 text.innerHTML = e.target.value;
+                this.setState({
+                    type: 'A'
+                });
             }
             break;
         }
@@ -45,7 +57,7 @@ class PostIt extends Component {
         return (
             <Draggable tag="board" addItem={this.props.addItem} customEvent={this.OnChange}>   
                 <form>
-                    <Content readOnly onChange={this.OnChange} />
+                    <Content readOnly onChange={this.OnChange} className={this.state.type} />
                 </form>
             </Draggable>
         );

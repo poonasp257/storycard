@@ -4,7 +4,7 @@ import tileImg from '../resources/tile.jpg';
 import DropZone from './DropZone';
 
 const Main = styled.div`
-    position: absolute;
+    position: relative;
     top: ${props => props.rect.top}px;
     left: ${props => props.rect.left}px;
     width: ${props => props.rect.width}px;

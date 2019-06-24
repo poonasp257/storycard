@@ -45,9 +45,12 @@ class Draggable extends Component {
         this.dragElem.style["top"] = `${this.fixedY}px`;
         this.dragElem.style["right"] = `${this.fixedX + this.offsetX}px`;
         this.dragElem.style["bottom"] = `${this.fixedY + this.offsetY}px`;
+
+        console.log(this.dragElem.style["left"])
     };
 
     GetRects = (targets) => {
+        console.log(targets[0]);
         return (
             Object.keys(targets).map((key) => {
                 const width = parseInt(targets[key].style["width"]);

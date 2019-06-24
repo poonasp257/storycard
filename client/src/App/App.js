@@ -36,6 +36,7 @@ const PostBox = styled.div`
 `;
 
 const Main = styled.div`
+  position: relative;
   user-select: none;
   marigin:auto;
 `;
@@ -108,7 +109,7 @@ class App extends Component {
       if(this.condition.hasOwnProperty(type)) {
         if(this.condition[type] < condition[type]) {         
           console.log('Draw normal Pattern');
-          //return;
+          return;
         }
       }
     }
@@ -116,7 +117,7 @@ class App extends Component {
     const position = Pattern.position;
     let items = this.state.items.slice();    
     for(let index in items) {
-      if(position[index] == undefined) break;
+      if(position[index] === undefined) break;
       
       items[index].style["left"] = position[index].left + 'px';      
       items[index].style["top"] = position[index].top + 'px';
@@ -142,11 +143,12 @@ class App extends Component {
       });
     }
   
-    document.addEventListener('mousedown', this.test);
+    //document.addEventListener('mousedown', this.test);
 
     return (      
       <Main>
         <Board row={15} col={20} setItems={this.setItems} items={this.state.items} />
+        
         <ButtonBox>
             <Button onClick={this.Back}>Back</Button>
             <Button onClick={this.Draw}>Draw</Button>
@@ -164,3 +166,8 @@ class App extends Component {
 
 
 export default App;
+
+
+/*
+
+*/
