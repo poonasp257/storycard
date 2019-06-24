@@ -36,7 +36,6 @@ class PostIt extends Component {
     OnChange = (e) => {
 
         let items = this.props.items.slice();
-        console.log(items);
         for(let item of items) {
             if(item.id !== e.target.closest('div').id) continue;
 
@@ -45,7 +44,7 @@ class PostIt extends Component {
                 text.value = e.target.value;
                 text.innerHTML = e.target.value;
                 this.setState({
-                    type: 'A'
+                    type: 'D'
                 });
             }
             break;

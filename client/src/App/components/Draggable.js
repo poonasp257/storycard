@@ -45,12 +45,9 @@ class Draggable extends Component {
         this.dragElem.style["top"] = `${this.fixedY}px`;
         this.dragElem.style["right"] = `${this.fixedX + this.offsetX}px`;
         this.dragElem.style["bottom"] = `${this.fixedY + this.offsetY}px`;
-
-        console.log(this.dragElem.style["left"])
     };
 
     GetRects = (targets) => {
-        console.log(targets[0]);
         return (
             Object.keys(targets).map((key) => {
                 const width = parseInt(targets[key].style["width"]);
@@ -73,10 +70,10 @@ class Draggable extends Component {
     }
 
     Overlap = (lhs, rhs) => {
-        return !(
-            lhs.top > rhs.bottom || lhs.right < rhs.left ||
-            lhs.bottom < rhs.top || lhs.left > rhs.right
-        );
+        return (
+            lhs.left < rhs.right && lhs.top < rhs.bottom  && 
+            lhs.right > rhs.left && lhs.bottom > rhs.top 
+        );  
     }
 
     IsContaining = (lhs, rhs) => {
@@ -150,7 +147,6 @@ class Draggable extends Component {
             if (this.IsContaining(targetRects[i], dragRect)) {
                 const otherObj = targets[i].getElementsByClassName("draggable");
                 const objRects = this.GetRects(otherObj);
-
                 for(let rect of objRects) {
                     if(this.Overlap(rect, dragRect)) return false;
                 }

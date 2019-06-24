@@ -7,10 +7,10 @@ const Content = styled.img`
     height: 60px;
 `;
 
-function Symbol(props) {
+function Symbol({type, image, addItem}) {
     return (
-    <Draggable tag="board" addItem={props.addItem}>
-        <Content src={props.image} alt="symbol" className={props.type}/>
+    <Draggable tag="board" addItem={addItem}>
+        <Content src={image} alt="symbol" className={type}/>
     </Draggable>
     );
 }

@@ -1,18 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-function DropZone(props) {
-    const content = props.children;
-    const style = {
-      position: 'relative',
-      left: props.rect.left,
-      top: props.rect.top,
-      width: props.rect.width,
-      height: props.rect.height
-    };
-    
+function DropZone({tag, rect, children}) {
+    const content = children;    
     return (
-      <div className={props.tag} style={style}>
+      <div className={tag} style={rect}>
         {content}
       </div>
     );

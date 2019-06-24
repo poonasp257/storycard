@@ -9,14 +9,14 @@ import Pattern from './data/Pattern.json';
 
 const Symbols = styled.div`
   position: absolute;
+  left: 1500px;
   top: 50px;
-  left: 1100px;
 `;
 
 const ButtonBox = styled.form`
   position: absolute;
-  top: 850px;
-  left: 950px;
+  left: 1500px; 
+  top: 880px;
 `;
 
 const Button = styled.button`
@@ -31,12 +31,11 @@ const Button = styled.button`
 
 const PostBox = styled.div`
   position: absolute;
+  left: 1700px;
   top: 50px;
-  left: 1300px;
 `;
 
 const Main = styled.div`
-  position: relative;
   user-select: none;
   marigin:auto;
 `;
@@ -104,6 +103,7 @@ class App extends Component {
 
   Draw = (e) => { 
     e.preventDefault();
+
     const condition = Pattern.condition;   
     for(let type in condition) {
       if(this.condition.hasOwnProperty(type)) {
@@ -128,27 +128,25 @@ class App extends Component {
     }
     this.setItems(items);
   }
-
+ 
   test = (e) => {
     console.log(e.clientX, e.clientY);
   }
 
   render() {
     let symbols = [];
-
     for(let key in ImageLoader) {
       ImageLoader[key].forEach((image) =>{
         symbols.push(<Symbol
-          image={image} addItem={this.addItem} type={key} key={symbols.length}/>);
+          type={key} image={image} addItem={this.addItem} key={symbols.length}/>);
       });
-    }
+    } 
+    
+    //document.addEventListener('mousedown', this.test)
   
-    //document.addEventListener('mousedown', this.test);
-
     return (      
       <Main>
-        <Board row={15} col={20} setItems={this.setItems} items={this.state.items} />
-        
+        <Board left={50} top={50} row={17} col={28} items={this.state.items} />
         <ButtonBox>
             <Button onClick={this.Back}>Back</Button>
             <Button onClick={this.Draw}>Draw</Button>
@@ -164,10 +162,4 @@ class App extends Component {
   }
 }
 
-
 export default App;
-
-
-/*
-
-*/
