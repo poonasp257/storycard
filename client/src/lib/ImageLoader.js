@@ -38,10 +38,9 @@ const Posts = [
 ];
 
 export default function ImageLoader(category) {
-    let filter = /^(symbols|posts)$/;
-    let filteredCategory = category.toLowerCase().replace(/ /gi, '');
-    if(!filter.test(filteredCategory)) return null;
+    let filter = /^(symbol|post)$/;
+    if(!filter.test(category)) return null;
     
-    if(filteredCategory === 'symbols') return Symbols;
-    else if(filteredCategory === 'posts') return Posts;
+    if(category === 'symbol') return Symbols;
+    else if(category === 'post') return Posts;
 }

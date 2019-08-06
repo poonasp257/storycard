@@ -14,7 +14,7 @@ const Container = styled.div`
 const List = styled.div`
     width: ${window.screen.width * 0.3}px;
     height: 280px;
-    border: 1px solid;
+    border: 2px solid;
 `;
 
 const Content = styled.div`
@@ -25,11 +25,15 @@ const Content = styled.div`
 function ItemList({ category, Item, targetTag }) {
     let items = [];
     const images = ImageLoader(category);
-    for(let image of images) {
+    
+    for(let i = 0; i < images.length; ++i) {
         items.push(
             <Content key={items.length}>
-                <Draggable tag={targetTag}>
-                    <Item image={image} mode={false}/>
+                <Draggable 
+                    type={i}
+                    category={category} 
+                    tag={targetTag}>
+                        <Item image={images[i]} mode={false}/>
                 </Draggable>
             </Content>
         );
@@ -37,7 +41,7 @@ function ItemList({ category, Item, targetTag }) {
 
     return (
         <Container>
-            <Category>{category}</Category>
+            <Category>{category.toUpperCase()}</Category>
             <List>
                 {items}
             </List>

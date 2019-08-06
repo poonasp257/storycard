@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import $ from 'jquery';
 import Materialize from 'materialize-css';
 import { Authentication } from 'components';
-import { registerRequest } from 'actions/authentication';
+import { registerRequest } from 'modules/authentication';
 
 class SignUp extends Component {
     handleRegister = (id, pw) => {
@@ -45,8 +45,8 @@ class SignUp extends Component {
 
 const mapStateToProps = (state) => {
     return {
-        status: state.authentication.register.status,
-        errorCode: state.authentication.register.error
+        status: state.authentication.getIn(['register', 'status']),
+        errorCode: state.authentication.getIn(['register', 'error'])
     };
 };
 

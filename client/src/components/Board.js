@@ -21,10 +21,11 @@ class Board extends Component {
         this.height = window.screen.height * 0.662;
     }
 
-    render() {      
+    render() {  
+        console.log(this.props.posts);    
         return (
             <Main width={this.width} height={this.height} className="board">
-                {this.props.items}
+                {this.props.posts}
             </Main>
         );
     }
@@ -32,7 +33,7 @@ class Board extends Component {
 
 const mapStateToProps = (state) => {
     return {
-        items: state.itemManager.items
+        posts: state.post.get('posts')
     };
 };
 

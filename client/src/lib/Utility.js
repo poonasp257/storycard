@@ -54,3 +54,7 @@ export function Pad(n, width) {
 export function NumberWithCommas(x) {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
+
+export function Simplification(str) {
+    return str.toLowerCase().replace(/ /gi, '');
+}

@@ -8,6 +8,8 @@ import Draggable from './Draggable';
 import Like from './Like';
 import Timer from './Timer';
 import Count from './Count';
+import TextBox from './TextBox';
+import Icon from './Icon';
 
 export {
     Authentication,
@@ -19,5 +21,7 @@ export {
     Draggable,
     Like,
     Timer,
-    Count
+    Count,
+    TextBox,
+    Icon
 };

@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import LinesEllipsis from 'react-lines-ellipsis';
-import { Timer, Like, Count } from 'components';
+import { Timer, Like, Count, TextBox } from 'components';
+
+import { connect } from 'react-redux';
 
 const Content = styled.div`
     position: relative;
@@ -12,29 +13,12 @@ const Content = styled.div`
 const Background = styled.img`
     width: ${props => props.width}px;
     height:  ${props => props.height}px;
-    :hover {
-        filter: black;
-    }
-`;
-
-const Text = styled.textarea`
-    position: absolute;
-    left: 10px;
-    top: 50px;    
-    width: ${props => props.width}px;
-    height: ${props => props.height}px;
-    border: 0;
-    resize: none;
-    :focus {
-        outline: none;
-    }
 `;
 
 class Post extends Component {
     constructor(props) {
         super(props);
 
-        this.IsOpened = false;
         this.ref = null;
 
         this.originWidth = props.mode ? 200 : 100;
@@ -43,96 +27,121 @@ class Post extends Component {
         this.state = {
             width: this.originWidth,
             height: this.originHeight,
-            description: 'Posting...'
+            isHover: false,
+            isOpened: false
         }
     }
 
     closePost = (event) => {
         if(this.ref.contains(event.target)) return false;
-
-        this.IsOpened = false;
+        
+        this.ref.setAttribute('style', 'cursor: pointer');
         this.setState({
             width: this.originWidth,
-            height: this.originHeight
+            height: this.originHeight,
+            isOpened: false
         });
         document.removeEventListener('mousedown', this.closePost);
     }
 
     handleClick = (event) => {  
-        if (this.IsOpened) return false;
+        if (this.state.isOpened) return false;
 
-        this.IsOpened = true;
+        this.ref.setAttribute('style', 'cursor: default');
         this.setState({
-            width: this.state.width * 3.0,
-            height: this.state.height * 3.0
+            width: this.state.width * 2.0,
+            height: this.state.height * 2.0,
+            isOpened: true
         });
         document.addEventListener('mousedown', this.closePost);
     }
 
-    renderUI = () => {
-        const description = this.state.description;
-        return (
-            <div>
-                <Timer/>
-                <Like/>
-                { this.IsOpened ? 
-                    <Text defaultValue={description}/> : 
-                    <LinesEllipsis text={description} maxLine='3' ellipsis='...' basedOn='letters'/> }
-                { this.IsOpened ? <Count/> : null }
-            </div>
-        );
+    handleMouseEnter = (event) => {
+        if(this.props.isDragging) return false;
+        
+        this.setState({ isHover: true });
+    }
+    
+    handleMouseOut = (event) => {
+        this.setState({ isHover: false });
     }
 
+    renderUI = () => {
+        const { isHover, isOpened } = this.state;
+        let ui = null;
+
+        const { created, likes, text, symbols } = this.props;
+
+        if(isHover) {
+            if(isOpened) {
+                ui =
+                    <div>
+                        <Timer created={created}/>
+                        <TextBox text={text} mode={true} postId={this.ref.id}/>
+                        <Like likes={likes} postId={this.ref.id}/>
+                        <Count symbols={symbols}/>
+                    </div>;
+            }
+            else {
+                ui =
+                    <div>
+                        <Timer created={created}/>
+                        <Like likes={likes} postId={this.ref.id}/>
+                        <Count symbols={symbols}/>
+                    </div>;
+            }
+        }
+        else {
+            if(isOpened) {
+                ui =
+                    <div>
+                        <Timer created={created}/>
+                        <TextBox text={text} mode={true} postId={this.ref.id}/>
+                        <Like likes={likes} postId={this.ref.id}/>
+                        <Count symbols={symbols}/>
+                    </div>;
+            }
+            else {                
+                ui =
+                    <div>
+                        <TextBox text={text} mode={false}/>
+                    </div>;
+            }
+        }
+        
+        return ui;
+    }
+    
     render() {
-        return (
-            <Content className="post" onClick={this.handleClick} ref={(c) => this.ref = c}>
-                <Background 
-                    src={this.props.image} 
-                    draggable="false"
-                    width={this.state.width}
-                    height={this.state.height}
-                />
-                { this.props.mode ? this.renderUI() : null }
-            </Content>
-        );
+        const { id, mode, image } = this.props;
+        
+        const backgroundIMG =
+            <Background 
+                src={image} draggable="false"
+                width={this.state.width} height={this.state.height}
+            />;
+        const deactivated =
+            <Content id={id} className="post" ref={(r) => this.ref = r}>
+                { backgroundIMG }
+            </Content>;            
+        const activated =
+            <Content 
+                id={id} className="post" ref={(r) => this.ref = r}
+                onClick={this.handleClick} 
+                onMouseEnter={this.handleMouseEnter}
+                onMouseLeave={this.handleMouseOut}>
+                { backgroundIMG }
+                { this.renderUI() } 
+            </Content>;
+
+        return mode ? activated : deactivated;
     }
 }
 
-export default Post;
+const mapStateToProps = (state) => {
+    return {
+        isDragging: state.drag.get('isDragging')
+    };
+};
 
-
-// <LinesEllipsis
-// text={'hello worldsadasdasdasdasdasdasasd'}
-// maxLine='2'
-// ellipsis='...'
-// basedOn='letters'
-// />
-
-// componentDidUpdate() {
-//     const board = document.getElementsByClassName('board');
-//     const texts = board[0].getElementsByTagName('textarea');
-
-//     for (let text of texts) {
-//         text.removeAttribute('readOnly');
-//         text.addEventListener('change', this.OnChange);
-//         //text.addEventListener('keydown', this.OnKeyDown);
-//     }
-// }
-
-// OnChange = (e) => {
-//     let items = this.props.items.slice();
-//     for (let item of items) {
-//         if (item.id !== e.target.closest('div').id) continue;
-
-//         let texts = item.getElementsByTagName('TEXTAREA');
-//         for (let text of texts) {
-//             text.value = e.target.value;
-//             text.innerHTML = e.target.value;
-//             this.setState({
-//                 type: 'D'
-//             });
-//         }
-//         break;
-//     }
-//     this.props.setItems(items);
-// }
+export default connect(mapStateToProps, null)(Post);

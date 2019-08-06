@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import $ from 'jquery';
 import Materialize from 'materialize-css';
 import { Authentication } from 'components'
-import { loginRequest } from 'actions/authentication';
+import { loginRequest } from 'modules/authentication';
 
 class SignIn extends Component {
     handleLogin = (id, pw) => {
@@ -41,7 +41,7 @@ class SignIn extends Component {
 
 const mapStateToProps = (state) => {
     return {
-        status: state.authentication.login.status
+        status: state.authentication.getIn(['login', 'status'])
     };
 };
 

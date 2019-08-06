@@ -8,7 +8,7 @@ const Content = styled.img`
 
 function Symbol({ image }) {
     return (
-        <Content src={image} draggable="false">
+        <Content className="symbol" src={image} draggable="false">
         </Content>
     );
 }

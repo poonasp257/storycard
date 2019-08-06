@@ -3,8 +3,9 @@ import styled from 'styled-components';
 
 const Content = styled.div`
     position: absolute;
-    right: 0px;
-    bottom: 0px;
+    left: 50%;
+    top: 80%;
+    transform:translate(-50%, -80%);
 `;
 
 class Count extends Component {
@@ -20,7 +21,7 @@ class Count extends Component {
     render() {
         const { count, goal } = this.state;
         return (
-            <Content>
+            <Content className="white-text">
                 {count} / {goal}
             </Content>
         );

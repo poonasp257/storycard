@@ -6,7 +6,8 @@ import Materialize from 'materialize-css';
 import { Menu, Board, Symbol, Post, ItemList } from 'components';
 
 import { connect } from 'react-redux';
-import { getStatusRequest } from 'actions/authentication';
+import { getStatusRequest } from 'modules/authentication';
+import { getPostsRequest } from 'modules/post';
 
 const Main = styled.div`
     user-select: none;
@@ -19,6 +20,12 @@ const Title = styled.h1`
 `;
 
 class Home extends Component {
+    constructor(props) {
+        super(props);
+
+        this.timerID = null;
+    }
+
     checkLoginData = () => {        
         function getCookie(name) {
             var value = "; " + document.cookie;
@@ -40,7 +47,7 @@ class Home extends Component {
 
         this.props.getStatusRequest().then(
             () => {
-                if (!this.props.status.valid) {
+                if (!this.props.loginStatus.get('valid')) {
                     // logout the session
                     loginData = {
                         isLoggedIn: false,
@@ -51,13 +58,28 @@ class Home extends Component {
 
                     const $toastContent = $('<span style="color: #FFB4BA">Your session is expired, please log in again</span>');
                     Materialize.toast({ html: $toastContent });
+                    this.props.history.push('/signin')
                 }
             }
         );
     }
 
+    getInfo = () => {
+        this.props.getPostsRequest().then(
+            () => {
+                //console.log(this.props.postStatus);
+            }   
+        );
+    }
+
     componentDidMount() {
-        //this.checkLoginData();
+        this.checkLoginData();
+        this.getInfo();
+        //this.timerID = setInterval(this.getInfo, 1000);
+    }
+
+    componentWillUnmount() {
+        //clearInterval(this.timerID);
     }
 
     render() {
@@ -66,8 +88,8 @@ class Home extends Component {
                 <Title>STORYCARD</Title>
                 <Menu/>
                 <Board/>
-                <ItemList category="SYMBOLS" Item={Symbol} targetTag="post"/>
-                <ItemList category="POSTS" Item={Post} targetTag="board"/>
+                <ItemList category="post" Item={Post} targetTag="board"/>
+                <ItemList category="symbol" Item={Symbol} targetTag="post"/>
             </Main>
         );
     };
@@ -75,7 +97,8 @@ class Home extends Component {
 
 const mapStateToProps = (state) => {
     return {
-        status: state.authentication.status
+        loginStatus: state.authentication.get('status'),
+        postStatus: state.post.getIn(['info', 'status'])
     };
 };
 
@@ -83,6 +106,9 @@ const mapDispatchToProps = (dispatch) => {
     return {
         getStatusRequest: () => {
             return dispatch(getStatusRequest());
+        },
+        getPostsRequest: () => {
+            return dispatch(getPostsRequest());
         }
     };
 };

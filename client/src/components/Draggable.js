@@ -4,7 +4,8 @@ import PropTypes from 'prop-types';
 import * as Utility from 'lib/Utility';
 
 import { connect } from  'react-redux';
-import { addItem } from 'actions/itemManager'; 
+import { writePostRequest } from 'modules/post'; 
+import { dragStart, dragEnd } from 'modules/drag';
 
 const Main = styled.div`
     display: inline-block;
@@ -38,18 +39,7 @@ class Draggable extends Component {
         
         this.sourceElem.addEventListener('mousedown', (e) => { this.handleMouseDown(e); });
     }
-    
-    CloneChildren(element) {
-        const Container = styled.div`${element.getAttribute('style')}`;
-        const cloneElem = React.cloneElement(this.props.children, { mode: true })
-        const number = this.props.items.length;
-        return (    
-            <Container className="item" key={number} id={number}>
-                {cloneElem}
-            </Container>
-        );
-    }
-
+        
     fixPositon = (x, y) => {    
         this.fixedX = x - (this.offsetX * 0.5) + window.scrollX;
         this.fixedY = y - (this.offsetY * 0.5) + window.scrollY;
@@ -66,11 +56,11 @@ class Draggable extends Component {
             
             this.fixPositon(e.clientX, e.clientY);
             document.body.appendChild(this.dragElem);
-            this.props.OnDragStart(e);
 
             document.addEventListener('mousemove', this.handleMouseMove);
             document.addEventListener('mouseup', this.handleMouseUp);
             this.setState({ isDragging: true });
+            this.props.dragStart();
         }
     }
 
@@ -78,7 +68,6 @@ class Draggable extends Component {
         if (this.state.isDragging) {
             window.getSelection().removeAllRanges();
             this.fixPositon(e.clientX, e.clientY);
-            this.props.OnDrag(e);
         }
     }
 
@@ -87,12 +76,31 @@ class Draggable extends Component {
         window.getSelection().removeAllRanges();
         this.fixPositon(e.clientX, e.clientY);
         this.Drop(e.clientX, e.clientY);
-        this.props.OnDragEnd(e);
         
         document.removeEventListener('mousemove', this.handleMouseMove);
         document.removeEventListener('mouseup', this.handleMouseUp);
         document.body.removeChild(this.dragElem);
         this.setState({ isDragging: false });
+        this.props.dragEnd();
+    }
+
+    handlePost = (element) => {
+        const { type, username } = this.props;
+        const left = element.style['left'];
+        const top = element.style['top'];
+
+        return this.props.writePostRequest(type, username, left, top).then(
+            () => {
+                if (this.props.status === 'SUCCESS') {
+                    
+                }
+            }
+        );
+    }
+
+    handleSymbol = (postId) => {
+        const { type } = this.props;
+        this.props.increaseSymbol(type, postId);
     }
 
     Drop = (x, y) => {        
@@ -117,8 +125,17 @@ class Draggable extends Component {
                 }
         
                 if (window.confirm('Are you sure, you want to drop this?')) {
-                    let cloneElem = this.CloneChildren(this.dragElem);
-                    this.props.addItem(cloneElem);
+                    switch(this.props.category) {
+                        case 'post':
+                            this.handlePost(this.dragElem);
+                            break;
+                        case 'symbol':
+                            this.handleSymbol(target.id);
+                            break;
+                        default:
+                            return false;
+                    }
+                    
                     return true;
                 }
             }
@@ -137,26 +154,25 @@ class Draggable extends Component {
 }
 
 Draggable.propTypes = {
+    type: PropTypes.number.isRequired,
+    category: PropTypes.string.isRequired,
     tag: PropTypes.string.isRequired
-};
-
-Draggable.defaultProps = {
-    OnDragStart: () => {},
-    OnDrag: () => {},
-    OnDragEnd: () => {}
 };
 
 const mapStateToProps = (state) => {
     return {
-        items: state.itemManager.items
+        username: state.authentication.getIn(['status', 'currentUser']),
+        status: state.post.getIn(['write', 'status'])
     }
 }
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        addItem: (item) => {
-            dispatch(addItem(item));
-        }
+        writePostRequest: (type, username, left, top) => { 
+            return dispatch(writePostRequest(type, username, left, top));
+        },
+        dragStart: () => dispatch(dragStart()),
+        dragEnd: () => dispatch(dragEnd())
     };
 };
 
