@@ -4,43 +4,77 @@ import axios from 'axios';
 
 import React from 'react';
 import styled from 'styled-components';
-import Post from 'components/Post';
-import ImageLoader from 'lib/ImageLoader';
-import { concat } from 'rxjs';
+import { Post, Symbol } from 'components';
+import ImageLoader from 'lib/ImageLoader'; 
+ 
+const ATTACH_ITEM = "post/ATTACH_ITEM";
+const ATTACH_ITEM_SUCCESS = "post/ATTACH_ITEM_SUCCESS";
+const ATTACH_ITEM_FAILURE = "post/ATTACH_ITEM_FAILURE";
 
-const POST_WRITE = "POST_WRITE";
-const POST_WRITE_SUCCESS = "POST_WRITE_SUCCESS";
-const POST_WRITE_FAILURE = "POST_WRITE_FAILURE";
+const DELETE_ITEM = "post/DELETE_ITEM";
+const DELETE_ITEM_SUCCESS = "post/DELETE_ITEM_SUCCESS";
+const DELETE_ITEM_FAILURE = "post/DELETE_ITEM_FAILURE";
 
-const POST_DELETE = "POST_DELETE";
-const POST_DELETE_SUCCESS = "POST_DELETE_SUCCESS";
-const POST_DELETE_FAILURE = "POST_DELETE_FAILURE";
+const INC_LIKE = "post/INC_LIKE";
+const INC_LIKE_SUCCESS = "post/INC_LIKE_SUCCESS";
+const INC_LIKE_FAILURE = "post/INC_LIKE_FAILURE";
 
-const POST_GET_INFO = "POST_GET_INFO";
-const POST_GET_INFO_SUCCESS = "POST_GET_INFO_SUCCESS";
-const POST_GET_INFO_FAILURE = "POST_GET_INFO_FAILURE";
+const DEC_LIKE = "post/DEC_LIKE";
+const DEC_LIKE_SUCCESS = "post/DEC_LIKE_SUCCESS";
+const DEC_LIKE_FAILURE = "post/DEC_LIKE_FAILURE";
 
-const POST_INC_LIKE = "POST_INC_LIKE";
-const POST_INC_LIKE_SUCCESS = "POST_INC_LIKE_SUCCESS";
-const POST_INC_LIKE_FAILURE = "POST_INC_LIKE_FAILURE";
+const EDIT_POST = "post/EDIT_POST";
+const EDIT_POST_SUCCESS = "post/EDIT_POST_SUCCESS";
+const EDIT_POST_FAILURE = "post/EDIT_POST_FAILURE";
 
-const POST_DEC_LIKE = "POST_DEC_LIKE";
-const POST_DEC_LIKE_SUCCESS = "POST_DEC_LIKE_SUCCESS";
-const POST_DEC_LIKE_FAILURE = "POST_DEC_LIKE_FAILURE";
+const GET_ITEMS = "post/GET_ITEMS";
+const GET_ITEMS_SUCCESS = "post/GET_ITEMS_SUCCESS";
+const GET_ITEMS_FAILURE = "post/GET_ITEMS_FAILURE";
 
-const POST_EDIT = "POST_EDIT";
-const POST_INC_SYMBOL = "POST_INC_SYMBOL";
-const POST_DEC_SYMBOL = "POST_DEC_SYMBOL";
+const LISTEN_GET_ITEM = "post/LISTEN_GET_ITEM";
+const LISTEN_DELETE_ITEM = "post/LISTEN_DELETE_ITEM";
+const LISTEN_EDIT_POST = "post/LISTEN_EDIT_POST"; 
 
-export function writePostRequest(type, username, left, top) {
+function CreatePost(data) {
+    const { _id, type, left, top, ...props } = data;
+    const Container = styled.div`
+        position: absolute;
+        left: ${left};
+        top: ${top};
+    `;
+    const images = ImageLoader('post');
+
+    return (
+        <Container className="item">
+            <Post id={_id} image={images[type]} {...props} mode={true} />
+        </Container>
+    );
+}
+
+function CreateSymbol(data) {
+    const { type, left, top, ...props } = data;
+    const Container = styled.div`
+            position: absolute;
+            left: ${left};
+            top: ${top};
+        `;
+    const images = ImageLoader('symbol');
+    return (
+        <Container className="item">
+            <Symbol image={images[type]} {...props} />
+        </Container>
+    );
+}
+
+export function attachItemRequest(category, data) {
     return (dispatch) => {
-        dispatch(writePost());
+        dispatch(attachItem());
 
-        return axios.post('/api/post/write', { type, username, left, top })
+        return axios.post(`/api/post/attach/${category}`, data)
             .then((response) => {
-                dispatch(writePostSuccess());
+                dispatch(attachItemSuccess());
             }).catch((error) => {
-                dispatch(writePostFailure(error.response.data.code));
+                dispatch(attachItemFailure(error.response.data.code));
             });
     }
 }
@@ -58,31 +92,49 @@ export function deletePostRequest(postId, username) {
     }
 }
 
+export function editPostRequest(postId, username, text) {
+    return (dispatch) => {
+        dispatch(editPost());
+
+        return axios.post('/api/post/edit', { postId, username, text })
+            .then((response) => {
+                dispatch(deletePostSuccess());
+            }).catch((error) => {
+                dispatch(deletePostFailure(error.response.data.code));
+            });
+    }
+}
+
 export function getPostsRequest() {
     return (dispatch) => {
-        dispatch(getInfo());
+        dispatch(getItems());
 
-        return axios.post('/api/post/getInfo')
+        return axios.post('/api/post/getItems/post')
             .then((response) => {                   
-                let posts = response.data.map((post) => {
-                    const { _id, type, left, top, ...props } = post;
-                    const Container = styled.div`
-                        position: absolute;
-                        left: ${left};
-                        top: ${top};
-                    `;
-                    const images = ImageLoader('post');
+                const posts = response.data.map((post) => {
+                    return CreatePost(post);
+                });
+                
+                dispatch(getItemsSuccess(posts));
+            }).catch((error) => {
+                dispatch(getItemsFailure(error));
+            });
+    }
+}
 
-                    return (
-                        <Container className="item" key={_id}>
-                            <Post id={_id} image={images[type]} {...props} mode={true} />
-                        </Container>
-                    );
+export function getSymbolsRequest(postId) {    
+    return (dispatch) => {
+        dispatch(getItems());
+
+        return axios.post('/api/post/getItems/symbol', { postId })
+            .then((response) => {                   
+                const symbols = response.data.map((symbol) => {
+                    return CreateSymbol(symbol);
                 });
 
-                dispatch(getInfoSuccess(posts));
+                dispatch(getItemsSuccess(symbols));
             }).catch((error) => {
-                dispatch(getInfoFailure(error));
+                dispatch(getItemsFailure(error));
             });
     }
 }
@@ -113,28 +165,56 @@ export function decreaseLikeRequest(postId, username) {
     }
 }
 
-export const writePost = createAction(POST_WRITE);
-export const writePostSuccess = createAction(POST_WRITE_SUCCESS);
-export const writePostFailure = createAction(POST_WRITE_FAILURE); // error
+export function updateItems(socket) {
+    return (dispatch) => {
+        socket.on('attached/post', (data) => {
+            const post = CreatePost(data);
+            dispatch({ type: LISTEN_GET_ITEM, payload: post });
+        });
 
-export const deletePost = createAction(POST_DELETE);
-export const deletePostSuccess = createAction(POST_DELETE_SUCCESS);
-export const deletePostFailure = createAction(POST_DELETE_FAILURE);
+        socket.on('attached/symbol', (data) => {
+            const symbol = CreateSymbol(data);
+            dispatch({ type: LISTEN_GET_ITEM, payload: symbol });
+        });
 
-export const getInfo = createAction(POST_GET_INFO);
-export const getInfoSuccess = createAction(POST_GET_INFO_SUCCESS); // posts
-export const getInfoFailure = createAction(POST_GET_INFO_FAILURE); // error
+        socket.on('delete', (index) => {
+            dispatch({ type: LISTEN_DELETE_ITEM, payload: index });
+        });
 
-export const increaseLike = createAction(POST_INC_LIKE);
-export const increaseLikeSuccess = createAction(POST_INC_LIKE_SUCCESS);
-export const increaseLikeFailure = createAction(POST_INC_LIKE_FAILURE);
+        socket.on('edit', (data) => {
+            const { index, info } = data;
+            const post = CreatePost(info);
+            dispatch({ type: LISTEN_EDIT_POST, payload: { index, post } })
+        });
+    }
+}
 
-export const decreaseLike = createAction(POST_DEC_LIKE);
-export const decreaseLikeSuccess = createAction(POST_DEC_LIKE_SUCCESS);
-export const decreaseLikeFailure = createAction(POST_DEC_LIKE_FAILURE);
+export const attachItem = createAction(ATTACH_ITEM);
+export const attachItemSuccess = createAction(ATTACH_ITEM_SUCCESS);
+export const attachItemFailure = createAction(ATTACH_ITEM_FAILURE); // error
+
+export const deletePost = createAction(DELETE_ITEM);
+export const deletePostSuccess = createAction(DELETE_ITEM_SUCCESS);
+export const deletePostFailure = createAction(DELETE_ITEM_FAILURE);
+
+export const editPost = createAction(EDIT_POST);
+export const editPostSuccess = createAction(EDIT_POST_SUCCESS);
+export const editPostFailure = createAction(EDIT_POST_FAILURE);
+
+export const increaseLike = createAction(INC_LIKE);
+export const increaseLikeSuccess = createAction(INC_LIKE_SUCCESS);
+export const increaseLikeFailure = createAction(INC_LIKE_FAILURE);
+
+export const decreaseLike = createAction(DEC_LIKE);
+export const decreaseLikeSuccess = createAction(DEC_LIKE_SUCCESS);
+export const decreaseLikeFailure = createAction(DEC_LIKE_FAILURE);
+
+export const getItems = createAction(GET_ITEMS);
+export const getItemsSuccess = createAction(GET_ITEMS_SUCCESS); // posts
+export const getItemsFailure = createAction(GET_ITEMS_FAILURE); // error
 
 const initialState = Map({
-    write: Map({
+    attach: Map({
         status: 'INIT',
         error: -1
     }),
@@ -150,97 +230,122 @@ const initialState = Map({
         status: 'INIT',
         error: -1
     }),
-    posts: List([]), // react components
-    postsInfo: List([])
+    edit: Map({
+        status: 'INIT',
+        error: -1
+    }),
+    items: List([])
 });
 
 export default handleActions({
-    [POST_WRITE]: (state, action) => {
-        return state.set('write', Map({
+    [ATTACH_ITEM]: (state, action) => {
+        return state.set('attach', Map({
             status: 'WAITING',
             error: -1
         }));
     },
-    [POST_WRITE_SUCCESS]: (state, action) => {
-        return state.setIn(['write', 'status'], 'SUCCESS');
+    [ATTACH_ITEM_SUCCESS]: (state, action) => {
+        return state.setIn(['attach', 'status'], 'SUCCESS');
     },
-    [POST_WRITE_FAILURE]: (state, action) => {
+    [ATTACH_ITEM_FAILURE]: (state, action) => {
         const error = action.payload;
-
-        return state.set('write', Map({
+        return state.set('attach', Map({
             status: 'FAILURE',
             error: error
         }));
     },
-    [POST_DELETE]: (state, action) => {
+    [DELETE_ITEM]: (state, action) => {
         return state.set('delete', Map({
             status: 'WAITING',
             error: -1
         }));
     },
-    [POST_DELETE_SUCCESS]: (state, action) => {
+    [DELETE_ITEM_SUCCESS]: (state, action) => {
         return state.setIn(['delete', 'status'], 'SUCCESS');
     },
-    [POST_DELETE_FAILURE]: (state, action) => {
+    [DELETE_ITEM_FAILURE]: (state, action) => {
         const error = action.payload;
-
         return state.set('delete', Map({
             status: 'FAILURE',
             error: error
         }));
     },
-    [POST_GET_INFO]: (state, action) => {
+    [EDIT_POST]: (state, action) => {
+        return state.set('edit', Map({
+            status: 'WAITING',
+            error: -1
+        }));
+    },
+    [EDIT_POST_SUCCESS]: (state, action) => {
+        return state.setIn(['edit', 'status'], 'SUCCESS');
+    },
+    [EDIT_POST_FAILURE]: (state, action) => {
+        const error = action.payload;
+        return state.set('edit', Map({
+            status: 'FAILURE',
+            error: error
+        }));
+    },
+    [GET_ITEMS]: (state, action) => {
         return state.set('info', Map({
             status: 'WAITING',
             error: -1
         }));
     },
-    [POST_GET_INFO_SUCCESS]: (state, action) => {  
-        const posts = action.payload;
-        
+    [GET_ITEMS_SUCCESS]: (state, action) => {  
+        const items = action.payload;        
         return state.setIn(['info', 'status'], 'SUCCESS')
-                    .set('posts', List(posts)); 
+                    .set('items', List(items)); 
     },
-    [POST_GET_INFO_FAILURE]: (state, action) => {
+    [GET_ITEMS_FAILURE]: (state, action) => {
         const error = action.payload;
-
         return state.set('info', Map({
             status: 'FAILURE',
             error: error
         }));
     },
-    [POST_INC_LIKE]: (state, action) => {
+    [INC_LIKE]: (state, action) => {
         return state.set('like', Map({
             status: 'WAITING',
             error: -1
         }));
     },
-    [POST_INC_LIKE_SUCCESS]: (state, action) => {
+    [INC_LIKE_SUCCESS]: (state, action) => {
         return state.setIn(['like', 'status'], 'SUCCESS');
     },
-    [POST_INC_LIKE_FAILURE]: (state, action) => {
+    [INC_LIKE_FAILURE]: (state, action) => {
         const error = action.payload;
-
         return state.set('like', Map({
             status: 'FAILURE',
             error: error
         }));
     },
-    [POST_DEC_LIKE]: (state, action) => {
+    [DEC_LIKE]: (state, action) => {
         return state.set('like', Map({
             status: 'WAITING',
             error: -1
         }));
     },
-    [POST_DEC_LIKE_SUCCESS]: (state, action) => {
+    [DEC_LIKE_SUCCESS]: (state, action) => {
         return state.setIn(['like', 'status'], 'SUCCESS');
     },
-    [POST_DEC_LIKE_FAILURE]: (state, action) => {
+    [DEC_LIKE_FAILURE]: (state, action) => {
         const error = action.payload;
-
         return state.set('info', Map({
             status: 'FAILURE',
             error: error
         }));
+    },    
+    [LISTEN_GET_ITEM]: (state, action) => {
+        const item = action.payload;
+        return state.update('items', items => items.push(item));
+    }, 
+    [LISTEN_DELETE_ITEM]: (state, action) => {
+        const index = action.payload;
+        return state.update('items', items => items.splice(index, 1));
+    },
+    [LISTEN_EDIT_POST]: (state, action) => {
+        const { index, post } = action.payload;
+        return state.setIn(['items', index], post);
     }
 }, initialState);

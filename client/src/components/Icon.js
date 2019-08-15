@@ -7,7 +7,6 @@ export default function Icon(props) {
         cursor: pointer;
         font-size: ${size}px;
         color: ${color};
-        margin: 5px;
     `;
     
     return (

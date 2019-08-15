@@ -1,68 +1,108 @@
 import express from 'express';
 import Post from '../models/post';
+import _ from 'lodash';
 
 const router = express.Router();
 
 let posts = null;
-
 Post.find({}, null, (err, datas) => {
-    if(err) throw err;
+    if (err) throw err;
     posts = datas;
 });
 
-router.post('/getInfo', (req, res) => {
+router.post('/getItems/post', (req, res) => {
     return res.json(posts);
 });
 
-router.post('/write', (req, res) => {
-    const { type, username, left, top } = req.body;
+router.post('/getItems/symbol', (req, res) => {
+    const { postId } = req.body;
+    const index = posts.findIndex((post) => { return post.id === postId });
 
+    return res.json(posts[index].symbols);
+});
+
+router.post('/attach/post', (req, res) => {
+    const { type, username, left, top } = req.body;
     let post = new Post({
         type: type,
-        username: username,
         left: left,
         top: top,
         likes: [],
         text: '',
-        symbols: {}
+        symbols: [],
+        username: username,
     });
 
     posts.push(post);
-        
     post.save(err => {
-        if(err) throw err;        
+        if (err) throw err;
         return res.json({
             id: post._id,
-            success: true 
+            success: true
         });
-    })
+    });
+
+    console.log('attach post Request');
+    req.io.sockets.emit('attached/post', post);
+});
+
+router.post('/attach/symbol', (req, res) => {
+    const { type, postId, left, top } = req.body;
+    const index = posts.findIndex((post) => { return post.id === postId });
+
+    posts[index].symbols.push({ type, left, top });
+    Post.updateOne({ id: postId }, { $push: { symbols: { type, left, top } } }, (err) => {
+        if (err) throw err;
+
+        return res.json({ success: true });
+    });
+
+    req.io.sockets.emit('attached/symbol', { type, left, top });
 });
 
 router.post('/delete', (req, res) => {
     const { postId, username } = req.body;
+    const index = posts.findIndex((post) => {
+        return post.id === postId
+            && post.username === username;
+    });
+    if (index < 0) return res.json({ success: false });
 
-    const index = posts.findIndex((post) => { return post.id === postId });
     posts.splice(index, 1);
-
     Post.deleteOne({ _id: postId, username: username }, (err) => {
-        if(err) throw err;
+        if (err) throw err;
 
         return res.json({ success: true });
-    });
+    }); 
+
+    req.io.sockets.emit('delete', index);
 });
 
 router.post('/edit', (req, res) => {
     const { postId, username, text } = req.body;
+    const index = posts.findIndex((post) => {
+        return post.id === postId
+            && post.username === username;
+    });
+    if (index < 0) return res.json({ success: false });
 
-    Post.updateOne({ _id: id }, { $set: { text: text } }, (err) => {
-        if(err) throw err;
+    posts[index].text = text;
+    Post.updateOne({ _id: postId, username: username }, { $set: { text: text } }, (err) => {
+        if (err) throw err;
 
         return res.json({ success: true });
     });
+
+    req.io.sockets.emit('edit', { index, info: posts[index] });
 });
 
 router.post('/like', (req, res) => {
     const { postId, username } = req.body;
+    const index = posts.findIndex((post) => {
+        return post.id === postId
+            && post.username === username;
+    });
+    if (index < 0) return res.json({ success: false });
 
     Post.updateOne({ _id: postId }, { $push: { likes: username } }, (err) => {
         if (err) throw err;
@@ -75,18 +115,7 @@ router.post('/dislike', (req, res) => {
     const { postId, username } = req.body;
 
     Post.updateOne({ _id: postId }, { $pull: { likes: username } }, (err) => {
-        if(err) throw err;
-
-        return res.json({ success: true });
-    });
-});
-
-router.post('/symbol', (req, res) => {
-    const { postId, type, count } = req.body;
-    const target = `symbols.${type}`;
-
-    Post.updateOne({ _id: postId }, { $inc: { [target] : count } }, (err) => {
-        if(err) throw err;
+        if (err) throw err;
 
         return res.json({ success: true });
     });

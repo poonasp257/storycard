@@ -3,18 +3,18 @@ import styled from 'styled-components';
 import ImageLoader from 'lib/ImageLoader';
 import { Draggable } from 'components';
 
-const Category = styled.h3`
+const Category = styled.div`
     text-align: left;
+    font-size: 3em;
 `;
 
 const Container = styled.div`
-    float: left; 
-`;
-
-const List = styled.div`
-    width: ${window.screen.width * 0.3}px;
-    height: 280px;
+    width: ${window.screen.width * 0.15}px;
+    height: ${window.screen.height * 0.8}px;
+    margin: 15px;
+    padding: 15px;
     border: 2px solid;
+    background-color: white;
 `;
 
 const Content = styled.div`
@@ -42,9 +42,7 @@ function ItemList({ category, Item, targetTag }) {
     return (
         <Container>
             <Category>{category.toUpperCase()}</Category>
-            <List>
-                {items}
-            </List>
+            {items}
         </Container>
     );
 };

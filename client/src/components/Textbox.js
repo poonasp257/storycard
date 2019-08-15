@@ -4,7 +4,7 @@ import LinesEllipsis from 'react-lines-ellipsis';
 import Icon from './Icon';
 
 import { connect } from  'react-redux';
-import { deletePostRequest } from 'modules/post';
+import { editPostRequest, deletePostRequest } from 'modules/post';
 
 const Content = styled.div`
     position: absolute;
@@ -30,7 +30,7 @@ class TextBox extends Component {
         super(props);
 
         this.state = {
-            description: '',
+            description: props.text,
             isEditMode: false
         };
     };
@@ -42,11 +42,15 @@ class TextBox extends Component {
     }
     
     handleEdit = () => {
-        const { isEditMode } = this.state;
-        //description, 
+        const { isEditMode, description } = this.state;
+        const { postId, username } = this.props;
         if(isEditMode) {
             if(window.confirm('Are you sure, you want to edit this post')) {
-            // server에 request(description)
+                this.props.editPostRequest(postId, username, description).then(
+                    () => {
+
+                    }
+                );
             }
         }
 
@@ -77,23 +81,23 @@ class TextBox extends Component {
     render() {
         const { mode } = this.props;
         const { description, isEditMode } = this.state;
-        const editMode = isEditMode ? 'check' : 'edit';
-        const viewMode = isEditMode ? 
+        const editIcon = isEditMode ? 'check' : 'edit';
+        const editMode = isEditMode ? 
             <Text defaultValue={description} onChange={this.handleChange}/>
-            : <Text defaultValue={description} readonly cursor="inherit"/>;
+            : <Text defaultValue={description} readOnly cursor="inherit"/>;
             
-        const text = mode ?
+        const viewMode = mode ?
             <div>
-                {viewMode}
-                <Icon type={editMode} onClick={this.handleEdit}/>
+                {editMode}
+                <Icon type={editIcon} onClick={this.handleEdit}/>
                 <Icon type="delete" onClick={this.handleDelete}/>
             </div>
             : <LinesEllipsis text={description} maxLine='6' 
                 ellipsis='...' basedOn='letters'/>;
 
         return (
-            <Content>
-                {text}
+            <Content onContextMenu="return false" onDragStart="return false" onSelectStart="return false">
+                {viewMode}
             </Content>
         );
     };
@@ -108,6 +112,9 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
     return {
+        editPostRequest: (postId, username, text) => {
+            return dispatch(editPostRequest(postId,username, text));
+        },
         deletePostRequest: (postId, username) => {
             return dispatch(deletePostRequest(postId, username));
         }

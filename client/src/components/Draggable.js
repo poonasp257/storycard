@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import * as Utility from 'lib/Utility';
 
 import { connect } from  'react-redux';
-import { writePostRequest } from 'modules/post'; 
+import { attachItemRequest  } from 'modules/post'; 
 import { dragStart, dragEnd } from 'modules/drag';
 
 const Main = styled.div`
@@ -84,24 +84,15 @@ class Draggable extends Component {
         this.props.dragEnd();
     }
 
-    handlePost = (element) => {
-        const { type, username } = this.props;
-        const left = element.style['left'];
-        const top = element.style['top'];
-
-        return this.props.writePostRequest(type, username, left, top).then(
+    handleItem = (category, info) => {
+        this.props.attachItemRequest(category, info).then(
             () => {
                 if (this.props.status === 'SUCCESS') {
-                    
+
                 }
             }
         );
-    }
-
-    handleSymbol = (postId) => {
-        const { type } = this.props;
-        this.props.increaseSymbol(type, postId);
-    }
+    } 
 
     Drop = (x, y) => {        
         const targets = [...document.getElementsByClassName(this.props.tag)];
@@ -125,17 +116,27 @@ class Draggable extends Component {
                 }
         
                 if (window.confirm('Are you sure, you want to drop this?')) {
-                    switch(this.props.category) {
+                    const { type, username, category } = this.props;
+                    const params = window.location.pathname.split('/');
+                    const postId = params.pop();
+                    const info = {
+                        type,
+                        left: this.dragElem.style['left'],
+                        top: this.dragElem.style['top']
+                    };
+
+                    switch(category) {
                         case 'post':
-                            this.handlePost(this.dragElem);
+                            info.username = username;    
                             break;
                         case 'symbol':
-                            this.handleSymbol(target.id);
+                            info.postId = postId;
                             break;
                         default:
                             return false;
                     }
-                    
+
+                    this.handleItem(category, info);                    
                     return true;
                 }
             }
@@ -162,14 +163,14 @@ Draggable.propTypes = {
 const mapStateToProps = (state) => {
     return {
         username: state.authentication.getIn(['status', 'currentUser']),
-        status: state.post.getIn(['write', 'status'])
+        status: state.post.getIn(['attach', 'status'])
     }
 }
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        writePostRequest: (type, username, left, top) => { 
-            return dispatch(writePostRequest(type, username, left, top));
+        attachItemRequest: (category, data) => { 
+            return dispatch(attachItemRequest(category, data));
         },
         dragStart: () => dispatch(dragStart()),
         dragEnd: () => dispatch(dragEnd())

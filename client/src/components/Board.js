@@ -4,28 +4,19 @@ import { connect } from 'react-redux';
 import tile from 'resources/tile.jpg';
 
 const Main = styled.div`
-    float: left;
-    margin: 40px;
     background-image: url(${tile});
-    width: ${props => props.width}px;
-    height: ${props => props.height}px;
+    width: ${window.screen.width * 0.9}px;
+    height: ${window.screen.height * 0.7}px;
     border: 2px solid;
-    box-shadow: 3px 3px 5px 2px rgba(0, 0, 0, 0.35);
+    box-shadow: 3px 3px 5px 2px rgba(0, 0, 0, 0.35); 
+    display: inline-block;
 `;
 
 class Board extends Component {
-    constructor(props) {
-        super(props);
-
-        this.width = window.screen.width * 0.6;
-        this.height = window.screen.height * 0.662;
-    }
-
     render() {  
-        console.log(this.props.posts);    
         return (
-            <Main width={this.width} height={this.height} className="board">
-                {this.props.posts}
+            <Main className="board">
+                {this.props.items}
             </Main>
         );
     }
@@ -33,7 +24,7 @@ class Board extends Component {
 
 const mapStateToProps = (state) => {
     return {
-        posts: state.post.get('posts')
+        items: state.post.get('items')
     };
 };
 

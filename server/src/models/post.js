@@ -4,13 +4,13 @@ const Schema = mongoose.Schema;
 
 const Post = new Schema({
     type: Number,
-    username: String,
     left: String,
-    top: String,
-    created: { type: Date, default: Date.now },    
+    top: String,  
     likes: Array,
     text: String,
-    symbols: Object
+    symbols: Array,
+    username: String,
+    created: { type: Date, default: Date.now }
 });
 
 export default mongoose.model('post', Post);

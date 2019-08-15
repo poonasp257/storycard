@@ -1,14 +1,15 @@
 import React, { Component } from 'react';
 import { Route } from 'react-router-dom';
-import { Home, SignIn, SignUp } from 'containers';
+import { Main, SignIn, SignUp } from 'containers';
 
 class App extends Component {
   render() {
     return (
       <div>
-        <Route exact path="/" component={Home} />
-        <Route path="/signin" component={SignIn} />
-        <Route path="/signup" component={SignUp} />
+        <Route exact path="/" component={Main}/>
+        <Route path="/post/:postId" component={Main}/>
+        <Route path="/signin" component={SignIn}/>
+        <Route path="/signup" component={SignUp}/>
       </div>
     );
   };

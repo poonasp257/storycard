@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import { Timer, Like, Count, TextBox } from 'components';
+import { Timer, Like, TextBox } from 'components';
 
 import { connect } from 'react-redux';
 
@@ -34,8 +34,8 @@ class Post extends Component {
 
     closePost = (event) => {
         if(this.ref.contains(event.target)) return false;
-        
-        this.ref.setAttribute('style', 'cursor: pointer');
+
+        this.ref.setAttribute('style', 'cursor: pointer; z-index: 0;');
         this.setState({
             width: this.originWidth,
             height: this.originHeight,
@@ -47,7 +47,7 @@ class Post extends Component {
     handleClick = (event) => {  
         if (this.state.isOpened) return false;
 
-        this.ref.setAttribute('style', 'cursor: default');
+        this.ref.setAttribute('style', 'cursor: default; z-index: 1;');
         this.setState({
             width: this.state.width * 2.0,
             height: this.state.height * 2.0,
@@ -70,7 +70,7 @@ class Post extends Component {
         const { isHover, isOpened } = this.state;
         let ui = null;
 
-        const { created, likes, text, symbols } = this.props;
+        const { created, likes, text } = this.props;
 
         if(isHover) {
             if(isOpened) {
@@ -79,7 +79,9 @@ class Post extends Component {
                         <Timer created={created}/>
                         <TextBox text={text} mode={true} postId={this.ref.id}/>
                         <Like likes={likes} postId={this.ref.id}/>
-                        <Count symbols={symbols}/>
+                        <span onClick={() => {
+                            window.location.href = `/post/${this.ref.id}`;
+                        }}>view</span>
                     </div>;
             }
             else {
@@ -87,7 +89,6 @@ class Post extends Component {
                     <div>
                         <Timer created={created}/>
                         <Like likes={likes} postId={this.ref.id}/>
-                        <Count symbols={symbols}/>
                     </div>;
             }
         }
@@ -98,7 +99,9 @@ class Post extends Component {
                         <Timer created={created}/>
                         <TextBox text={text} mode={true} postId={this.ref.id}/>
                         <Like likes={likes} postId={this.ref.id}/>
-                        <Count symbols={symbols}/>
+                        <span onClick={() => {
+                            window.location.href = `/post/${this.ref.id}`;
+                        }}>view</span>
                     </div>;
             }
             else {                
@@ -110,6 +113,10 @@ class Post extends Component {
         }
         
         return ui;
+    }
+
+    componentWillUnmount() {
+        document.removeEventListener('mousedown', this.closePost);
     }
     
     render() {

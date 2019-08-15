@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import { NumberWithCommas } from 'lib/Utility';
-import { Icon } from 'components';
+import { NumberWithCommas } from 'lib/Utility'; 
 
 import { connect } from  'react-redux';
 import { increaseLikeRequest, decreaseLikeRequest } from 'modules/post';
@@ -39,7 +38,7 @@ class Like extends Component {
         if(this.state.isLiked) { 
             this.props.decreaseLikeRequest(postId, username).then(
                 () => {
-                    if(this.props.status == 'SUCCESS') {
+                    if(this.props.status === 'SUCCESS') {
                         this.setState({ isLiked: false });
                     }
                 }
@@ -48,7 +47,7 @@ class Like extends Component {
         else { 
             this.props.increaseLikeRequest(postId, username).then(
                 () => {                    
-                    if(this.props.status == 'SUCCESS') {
+                    if(this.props.status === 'SUCCESS') {
                         this.setState({ isLiked: true });
                     }
                 }
