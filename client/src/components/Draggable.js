@@ -15,9 +15,6 @@ const Main = styled.div`
 class Draggable extends Component {
     constructor(props) {
         super(props);
-        this.state = {
-            isDragging: false,
-        }
 
         this.sourceElem = null;
         this.dragElem = null;
@@ -59,16 +56,13 @@ class Draggable extends Component {
 
             document.addEventListener('mousemove', this.handleMouseMove);
             document.addEventListener('mouseup', this.handleMouseUp);
-            this.setState({ isDragging: true });
             this.props.dragStart();
         }
     }
 
     handleMouseMove = (e) => {
-        if (this.state.isDragging) {
-            window.getSelection().removeAllRanges();
-            this.fixPositon(e.clientX, e.clientY);
-        }
+        window.getSelection().removeAllRanges();
+        this.fixPositon(e.clientX, e.clientY);
     }
 
     handleMouseUp = (e) => {
@@ -80,22 +74,11 @@ class Draggable extends Component {
         document.removeEventListener('mousemove', this.handleMouseMove);
         document.removeEventListener('mouseup', this.handleMouseUp);
         document.body.removeChild(this.dragElem);
-        this.setState({ isDragging: false });
         this.props.dragEnd();
     }
-
-    handleItem = (category, info) => {
-        this.props.attachItemRequest(category, info).then(
-            () => {
-                if (this.props.status === 'SUCCESS') {
-
-                }
-            }
-        );
-    } 
-
+ 
     Drop = (x, y) => {        
-        const targets = [...document.getElementsByClassName(this.props.tag)];
+        const targets = [...document.getElementsByClassName(this.props.targetTag)];
         const filteredTargets = targets.filter(
             (target) => {
                 let parentClass = target.parentNode.className;
@@ -116,33 +99,25 @@ class Draggable extends Component {
                 }
         
                 if (window.confirm('Are you sure, you want to drop this?')) {
-                    const { type, username, category } = this.props;
-                    const params = window.location.pathname.split('/');
-                    const postId = params.pop();
+                    const { type, tag } = this.props;
+                    const postId = window.location.pathname.split('/').pop();
                     const info = {
                         type,
+                        postId,
                         left: this.dragElem.style['left'],
                         top: this.dragElem.style['top']
                     };
 
-                    switch(category) {
-                        case 'post':
-                            info.username = username;    
-                            break;
-                        case 'symbol':
-                            info.postId = postId;
-                            break;
-                        default:
-                            return false;
-                    }
-
-                    this.handleItem(category, info);                    
-                    return true;
+                    this.props.attachItemRequest(tag, info).then(
+                        () => {
+                            if (this.props.status === 'SUCCESS') {
+            
+                            }
+                        }
+                    );    
                 }
             }
         }
-        
-        return false;
     }
 
     render() {
@@ -156,21 +131,20 @@ class Draggable extends Component {
 
 Draggable.propTypes = {
     type: PropTypes.number.isRequired,
-    category: PropTypes.string.isRequired,
-    tag: PropTypes.string.isRequired
+    tag: PropTypes.string.isRequired,
+    targetTag: PropTypes.string.isRequired,
 };
 
 const mapStateToProps = (state) => {
     return {
-        username: state.authentication.getIn(['status', 'currentUser']),
         status: state.post.getIn(['attach', 'status'])
     }
 }
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        attachItemRequest: (category, data) => { 
-            return dispatch(attachItemRequest(category, data));
+        attachItemRequest: (category, info) => { 
+            return dispatch(attachItemRequest(category, info));
         },
         dragStart: () => dispatch(dragStart()),
         dragEnd: () => dispatch(dragEnd())

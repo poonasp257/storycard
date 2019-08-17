@@ -6,8 +6,6 @@ import Materialize from 'materialize-css';
 
 import { Menu, Board } from 'components';
 
-//, Symbol, Post, ItemList 
-
 import { connect } from 'react-redux';
 import { getStatusRequest, logoutRequest } from 'modules/authentication';
 import { getPostsRequest, getSymbolsRequest, updateItems } from 'modules/post';
@@ -54,26 +52,28 @@ class Main extends Component {
             return false;
         }
 
-        return this.props.getStatusRequest().then(
-            () => {
-                if (!this.props.status.auth.get('valid')) {
-                    // logout the session
-                    loginData = {
-                        isLoggedIn: false,
-                        username: ''
-                    };
+        return new Promise(() => {
+            this.props.getStatusRequest().then(
+                () => {
+                    if (!this.props.status.auth.get('valid')) {
+                        // logout the session
+                        loginData = {
+                            isLoggedIn: false,
+                            username: ''
+                        };
 
-                    document.cookie = 'key=' + btoa(JSON.stringify(loginData));
+                        document.cookie = 'key=' + btoa(JSON.stringify(loginData));
 
-                    const $toastContent = $('<span style="color: #FFB4BA">Your session is expired, please log in again</span>');
-                    Materialize.toast({ html: $toastContent });
-                    window.location.href = "/signin";
-                    return false;
+                        const $toastContent = $('<span style="color: #FFB4BA">Your session is expired, please log in again</span>');
+                        Materialize.toast({ html: $toastContent });
+                        window.location.href = "/signin";
+                        return false;
+                    }
+
+                    return true;
                 }
-
-                return true;
-            }
-        );
+            );
+        });
     }
 
     handleLogout = () => {
@@ -106,11 +106,15 @@ class Main extends Component {
         }
     }
     
-    componentDidMount() { 
-        if(!this.handleLogin()) return;
+    componentDidMount() {
+        // this.handleLogin().then(
+        //     (success) => {
+        //         if (!success) return;
 
-        this.getItems();
-        this.props.updateItems(this.socket);
+        //         this.getItems();
+        //         this.props.updateItems(this.socket);
+        //     }
+        // );
     }
 
     componentWillUnmount() {

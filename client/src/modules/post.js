@@ -43,7 +43,6 @@ function CreatePost(data) {
         top: ${top};
     `;
     const images = ImageLoader('post');
-
     return (
         <Container className="item">
             <Post id={_id} image={images[type]} {...props} mode={true} />
@@ -66,11 +65,11 @@ function CreateSymbol(data) {
     );
 }
 
-export function attachItemRequest(category, data) {
+export function attachItemRequest(tag, info) {
     return (dispatch) => {
         dispatch(attachItem());
 
-        return axios.post(`/api/post/attach/${category}`, data)
+        return axios.post(`/api/post/attach/${tag}`, info)
             .then((response) => {
                 dispatch(attachItemSuccess());
             }).catch((error) => {
@@ -79,11 +78,11 @@ export function attachItemRequest(category, data) {
     }
 }
 
-export function deletePostRequest(postId, username) {
+export function deletePostRequest(postId) {
     return (dispatch) => {
         dispatch(deletePost());
 
-        return axios.post('/api/post/delete', { postId, username })
+        return axios.post('/api/post/delete', { postId })
             .then((response) => {
                 dispatch(deletePostSuccess());
             }).catch((error) => {
@@ -92,11 +91,11 @@ export function deletePostRequest(postId, username) {
     }
 }
 
-export function editPostRequest(postId, username, text) {
+export function editPostRequest(postId, text) {
     return (dispatch) => {
         dispatch(editPost());
 
-        return axios.post('/api/post/edit', { postId, username, text })
+        return axios.post('/api/post/edit', { postId, text })
             .then((response) => {
                 dispatch(deletePostSuccess());
             }).catch((error) => {
@@ -117,7 +116,7 @@ export function getPostsRequest() {
                 
                 dispatch(getItemsSuccess(posts));
             }).catch((error) => {
-                dispatch(getItemsFailure(error));
+                dispatch(getItemsFailure(error.response.data.code));
             });
     }
 }
@@ -134,33 +133,33 @@ export function getSymbolsRequest(postId) {
 
                 dispatch(getItemsSuccess(symbols));
             }).catch((error) => {
-                dispatch(getItemsFailure(error));
+                dispatch(getItemsFailure(error.response.data.code));
             });
     }
 }
 
-export function increaseLikeRequest(postId, username) {
+export function increaseLikeRequest(postId) {
     return (dispatch) => {
         dispatch(increaseLike());
 
-        return axios.post('/api/post/like', { postId, username })
+        return axios.post('/api/post/like', { postId })
         .then(() => {
             dispatch(increaseLikeSuccess());
-        }).catch(() => {
-            dispatch(increaseLikeFailure());
+        }).catch((error) => {
+            dispatch(increaseLikeFailure(error.response.data.code));
         });
     }
 }
 
-export function decreaseLikeRequest(postId, username) {
+export function decreaseLikeRequest(postId) {
     return (dispatch) => {
         dispatch(decreaseLike());
 
-        return axios.post('/api/post/dislike', { postId, username })
+        return axios.post('/api/post/dislike', { postId })
         .then(() => {
             dispatch(decreaseLikeSuccess());
-        }).catch(() => {
-            dispatch(decreaseLikeFailure());
+        }).catch((error) => {
+            dispatch(decreaseLikeFailure(error.response.data.code));
         });
     }
 }

@@ -58,7 +58,7 @@ class Post extends Component {
 
     handleMouseEnter = (event) => {
         if(this.props.isDragging) return false;
-        
+                
         this.setState({ isHover: true });
     }
     
@@ -68,43 +68,26 @@ class Post extends Component {
 
     renderUI = () => {
         const { isHover, isOpened } = this.state;
-        let ui = null;
-
         const { created, likes, text } = this.props;
+        let ui =
+            <div>
+                <Timer created={created} />
+                <TextBox text={text} mode={true} postId={this.ref.id} />
+                <Like likes={likes} postId={this.ref.id} />
+                <span onClick={() => {
+                    window.location.href = `/post/${this.ref.id}`;
+                }}>view</span>
+            </div>;
 
-        if(isHover) {
-            if(isOpened) {
-                ui =
-                    <div>
-                        <Timer created={created}/>
-                        <TextBox text={text} mode={true} postId={this.ref.id}/>
-                        <Like likes={likes} postId={this.ref.id}/>
-                        <span onClick={() => {
-                            window.location.href = `/post/${this.ref.id}`;
-                        }}>view</span>
-                    </div>;
-            }
-            else {
+        if(!isOpened) {
+            if(isHover) {
                 ui =
                     <div>
                         <Timer created={created}/>
                         <Like likes={likes} postId={this.ref.id}/>
                     </div>;
             }
-        }
-        else {
-            if(isOpened) {
-                ui =
-                    <div>
-                        <Timer created={created}/>
-                        <TextBox text={text} mode={true} postId={this.ref.id}/>
-                        <Like likes={likes} postId={this.ref.id}/>
-                        <span onClick={() => {
-                            window.location.href = `/post/${this.ref.id}`;
-                        }}>view</span>
-                    </div>;
-            }
-            else {                
+            else {   
                 ui =
                     <div>
                         <TextBox text={text} mode={false}/>

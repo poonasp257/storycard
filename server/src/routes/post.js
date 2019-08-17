@@ -22,7 +22,7 @@ router.post('/getItems/symbol', (req, res) => {
 });
 
 router.post('/attach/post', (req, res) => {
-    const { type, username, left, top } = req.body;
+    const { type, left, top } = req.body;
     let post = new Post({
         type: type,
         left: left,
@@ -30,7 +30,7 @@ router.post('/attach/post', (req, res) => {
         likes: [],
         text: '',
         symbols: [],
-        username: username,
+        username: req.session.loginInfo.username,
     });
 
     posts.push(post);
@@ -41,8 +41,7 @@ router.post('/attach/post', (req, res) => {
             success: true
         });
     });
-
-    console.log('attach post Request');
+ 
     req.io.sockets.emit('attached/post', post);
 });
 
@@ -61,7 +60,8 @@ router.post('/attach/symbol', (req, res) => {
 });
 
 router.post('/delete', (req, res) => {
-    const { postId, username } = req.body;
+    const { postId } = req.body;
+    const username = req.session.loginInfo.username;
     const index = posts.findIndex((post) => {
         return post.id === postId
             && post.username === username;
@@ -79,7 +79,8 @@ router.post('/delete', (req, res) => {
 });
 
 router.post('/edit', (req, res) => {
-    const { postId, username, text } = req.body;
+    const { postId, text } = req.body;
+    const username = req.session.loginInfo.username;
     const index = posts.findIndex((post) => {
         return post.id === postId
             && post.username === username;
@@ -97,7 +98,8 @@ router.post('/edit', (req, res) => {
 });
 
 router.post('/like', (req, res) => {
-    const { postId, username } = req.body;
+    const { postId } = req.body;
+    const username = req.session.loginInfo.username;
     const index = posts.findIndex((post) => {
         return post.id === postId
             && post.username === username;
@@ -112,7 +114,8 @@ router.post('/like', (req, res) => {
 });
 
 router.post('/dislike', (req, res) => {
-    const { postId, username } = req.body;
+    const { postId } = req.body;
+    const username = req.session.loginInfo.username;
 
     Post.updateOne({ _id: postId }, { $pull: { likes: username } }, (err) => {
         if (err) throw err;

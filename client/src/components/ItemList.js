@@ -8,32 +8,22 @@ const Category = styled.div`
     font-size: 3em;
 `;
 
-const Container = styled.div`
-    width: ${window.screen.width * 0.15}px;
-    height: ${window.screen.height * 0.8}px;
-    margin: 15px;
-    padding: 15px;
-    border: 2px solid;
-    background-color: white;
-`;
+const Container = styled.div``;
 
 const Content = styled.div`
     float: left;
     margin: 10px;
 `;
 
-function ItemList({ category, Item, targetTag }) {
+function ItemList({ category, Item, tag, targetTag }) {
     let items = [];
     const images = ImageLoader(category);
-    
+
     for(let i = 0; i < images.length; ++i) {
         items.push(
             <Content key={items.length}>
-                <Draggable 
-                    type={i}
-                    category={category} 
-                    tag={targetTag}>
-                        <Item image={images[i]} mode={false}/>
+                <Draggable type={i} tag={tag} targetTag={targetTag}>
+                    <Item image={images[i]} mode={false}/>
                 </Draggable>
             </Content>
         );

@@ -42,11 +42,11 @@ class TextBox extends Component {
     }
     
     handleEdit = () => {
-        const { isEditMode, description } = this.state;
-        const { postId, username } = this.props;
+        const { isEditMode, description } = this.state; 
+        
         if(isEditMode) {
             if(window.confirm('Are you sure, you want to edit this post')) {
-                this.props.editPostRequest(postId, username, description).then(
+                this.props.editPostRequest(this.props.postId, description).then(
                     () => {
 
                     }
@@ -60,18 +60,14 @@ class TextBox extends Component {
     }
 
     handleDelete = () => {
-        if(!window.confirm('delete this?')) return false;
+        if(!window.confirm('delete this?')) return false; 
 
-        const { postId, username } = this.props;
-        
-        this.props.deletePostRequest(postId, username).then(
+        this.props.deletePostRequest(this.props.postId).then(
             () => {
                 if(this.props.status === 'SUCCESS') {
 
                 }
                 else {
-
-
 
                 }
             }
@@ -105,18 +101,20 @@ class TextBox extends Component {
 
 const mapStateToProps = (state) => {
     return {
-        username: state.authentication.getIn(['status', 'currentUser']),
-        status: state.post.get(['delete', 'status'])
+        status: {
+            edit: state.post.get(['edit', 'status']),
+            delete: state.post.get(['delete', 'status'])
+        } 
     }
 }
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        editPostRequest: (postId, username, text) => {
-            return dispatch(editPostRequest(postId,username, text));
+        editPostRequest: (postId, text) => {
+            return dispatch(editPostRequest(postId, text));
         },
-        deletePostRequest: (postId, username) => {
-            return dispatch(deletePostRequest(postId, username));
+        deletePostRequest: (postId) => {
+            return dispatch(deletePostRequest(postId));
         }
     }
 } 

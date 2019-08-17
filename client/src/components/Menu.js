@@ -9,7 +9,6 @@ const Container = styled.div`
     top: 0px;
     right: 0px;
     display: inline-block;
-    z-index: 2;
 `;
  
 const Button = styled.div`
@@ -18,6 +17,15 @@ const Button = styled.div`
     height: 60px;
     margin: 15px;     
 `;
+
+const Template = styled.div`
+    width: ${window.screen.width * 0.15}px;
+    height: ${window.screen.height * 0.8}px;
+    margin: 15px;
+    padding: 15px;
+    border: 2px solid;
+    background-color: white;
+`;
  
 class Menu extends Component {
     constructor(props) {
@@ -25,7 +33,7 @@ class Menu extends Component {
 
         this.state = { 
             isOpened: false,
-            content: null
+            menu: null
         };
     }    
 
@@ -41,32 +49,40 @@ class Menu extends Component {
         document.removeEventListener('mousedown', this.closeMenu);
     }
 
-    action1 = (event) => {
-        const content = <ItemList category="post" Item={Post} targetTag="board"/> 
+    openMenu = (contents) => {        
+        const menu = 
+            <Template>
+                {contents}
+            </Template>;        
 
         this.setState({
             isOpened: true,
-            content: content
+            menu: menu
         });
         document.addEventListener('mousedown', this.closeMenu);
     }
-
-    action2 = (event) => {
-        const content = <ItemList category="symbol" Item={Symbol} targetTag="board"/> 
-
-        this.setState({
-            isOpened: true,
-            content: content
-        });
-        document.addEventListener('mousedown', this.closeMenu);
-    }
-
+    
     closeMenu = (event) => {
         this.setState({
             isOpened: false,
-            content: null
+            menu: null
         });
         document.removeEventListener('mousedown', this.closeMenu);
+    }
+
+    openMenuPost = (event) => {
+        const contents = <ItemList category="post" Item={Post} tag="post" targetTag="board"/>;
+        this.openMenu(contents);
+    }
+
+    openMenuConflicts = (event) => {
+        const contents = <ItemList category="conflict" Item={Symbol} tag="symbol" targetTag="board"/>;
+        this.openMenu(contents);
+    }
+
+    openMenuSolutions = (event) => {
+        const contents = <ItemList category="solution" Item={Symbol} tag="symbol" targetTag="board"/>;
+        this.openMenu(contents);
     }
     
     render() { 
@@ -79,17 +95,22 @@ class Menu extends Component {
                     <ul>
                         <li>
                             <span className="btn-floating">
-                                <Icon type="help" />
+                                <Icon type="help"/>
+                            </span>
+                        </li>                        
+                        <li>
+                            <span className="btn-floating blue draken-1">
+                                <Icon type="create" onClick={this.openMenuPost}/>
                             </span>
                         </li>
                         <li>
                             <span className="btn-floating red darken-1">
-                                <Icon type="sentiment_very_dissatisfied" onClick={this.action1} />
+                                <Icon type="sentiment_very_dissatisfied" onClick={this.openMenuConflicts}/>
                             </span>
                         </li>
                         <li>
                             <span className="btn-floating yellow darken-1">
-                                <Icon type="sentiment_very_satisfied" onClick={this.action2} />
+                                <Icon type="sentiment_very_satisfied" onClick={this.openMenuSolutions}/>
                             </span>
                         </li>
                         <li>
@@ -99,7 +120,7 @@ class Menu extends Component {
                         </li>
                     </ul>
                 </Button>
-                {this.state.content}
+                {this.state.menu}
             </Container>
         );
     };

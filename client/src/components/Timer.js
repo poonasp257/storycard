@@ -31,6 +31,10 @@ class Timer extends Component {
     };
     
     ElipsedTime = () => {
+        if(remainTime <= 0) { 
+            clearTimeout(this.timerID);
+            return;
+        }
         const remainTime = this.state.remainTime - 1000;
 
         this.setState({
