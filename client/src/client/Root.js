@@ -1,4 +1,5 @@
 import React from 'react';
+import styled from 'styled-components';
 import { BrowserRouter } from 'react-router-dom';
 import App from 'shared/App';
 
@@ -9,13 +10,13 @@ import reducers from 'modules';
 
 const store = createStore(reducers, applyMiddleware(thunk));
 
-const Root = () => {
+const Root = () => { 
     return (
-      <BrowserRouter>
-        <Provider store={store}>
-            <App/>
-        </Provider>
-      </BrowserRouter>
+        <BrowserRouter>
+            <Provider store={store}>
+                <App />
+            </Provider>
+        </BrowserRouter>
     );
 }
 

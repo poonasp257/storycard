@@ -107,14 +107,14 @@ class Main extends Component {
     }
     
     componentDidMount() {
-        // this.handleLogin().then(
-        //     (success) => {
-        //         if (!success) return;
+        this.handleLogin().then(
+            (success) => {
+                if (!success) return;
 
-        //         this.getItems();
-        //         this.props.updateItems(this.socket);
-        //     }
-        // );
+                this.getItems();
+                this.props.updateItems(this.socket);
+            }
+        );
     }
 
     componentWillUnmount() {

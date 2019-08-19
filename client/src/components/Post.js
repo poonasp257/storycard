@@ -10,9 +10,10 @@ const Content = styled.div`
     display: inline-block;  
 `; 
 
-const Background = styled.img`
+const Background = styled.div`
     width: ${props => props.width}px;
     height:  ${props => props.height}px;
+    background-color: black;
 `;
 
 class Post extends Component {
@@ -105,14 +106,11 @@ class Post extends Component {
     render() {
         const { id, mode, image } = this.props;
         
-        const backgroundIMG =
-            <Background 
-                src={image} draggable="false"
-                width={this.state.width} height={this.state.height}
-            />;
+        const background =
+            <Background width={this.state.width} height={this.state.height}/>;
         const deactivated =
             <Content id={id} className="post" ref={(r) => this.ref = r}>
-                { backgroundIMG }
+                { background }
             </Content>;            
         const activated =
             <Content 
@@ -120,7 +118,7 @@ class Post extends Component {
                 onClick={this.handleClick} 
                 onMouseEnter={this.handleMouseEnter}
                 onMouseLeave={this.handleMouseOut}>
-                { backgroundIMG }
+                { background }
                 { this.renderUI() } 
             </Content>;
 

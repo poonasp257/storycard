@@ -19,28 +19,26 @@ import conflict18 from 'resources/conflicts/conflict18.png';
 import conflict19 from 'resources/conflicts/conflict19.png';
 import conflict20 from 'resources/conflicts/conflict20.png';
 
-import solution01 from 'resources/solutions/solution01.png';
-import solution02 from 'resources/solutions/solution02.png';
-import solution03 from 'resources/solutions/solution03.png';
-import solution04 from 'resources/solutions/solution04.png';
-import solution05 from 'resources/solutions/solution05.png';
-import solution06 from 'resources/solutions/solution06.png';
-import solution07 from 'resources/solutions/solution07.png';
-import solution08 from 'resources/solutions/solution08.png';
-import solution09 from 'resources/solutions/solution09.png';
-import solution10 from 'resources/solutions/solution10.png';
-import solution11 from 'resources/solutions/solution11.png';
-import solution12 from 'resources/solutions/solution12.png';
-import solution13 from 'resources/solutions/solution13.png';
-import solution14 from 'resources/solutions/solution14.png';
-import solution15 from 'resources/solutions/solution15.png';
-import solution16 from 'resources/solutions/solution16.png';
-import solution17 from 'resources/solutions/solution17.png';
-import solution18 from 'resources/solutions/solution18.png';
-import solution19 from 'resources/solutions/solution19.png';
-import solution20 from 'resources/solutions/solution20.png';
-
-import post01 from 'resources/post/post01.png';
+import resolution01 from 'resources/resolutions/resolution01.png';
+import resolution02 from 'resources/resolutions/resolution02.png';
+import resolution03 from 'resources/resolutions/resolution03.png';
+import resolution04 from 'resources/resolutions/resolution04.png';
+import resolution05 from 'resources/resolutions/resolution05.png';
+import resolution06 from 'resources/resolutions/resolution06.png';
+import resolution07 from 'resources/resolutions/resolution07.png';
+import resolution08 from 'resources/resolutions/resolution08.png';
+import resolution09 from 'resources/resolutions/resolution09.png';
+import resolution10 from 'resources/resolutions/resolution10.png';
+import resolution11 from 'resources/resolutions/resolution11.png';
+import resolution12 from 'resources/resolutions/resolution12.png';
+import resolution13 from 'resources/resolutions/resolution13.png';
+import resolution14 from 'resources/resolutions/resolution14.png';
+import resolution15 from 'resources/resolutions/resolution15.png';
+import resolution16 from 'resources/resolutions/resolution16.png';
+import resolution17 from 'resources/resolutions/resolution17.png';
+import resolution18 from 'resources/resolutions/resolution18.png';
+import resolution19 from 'resources/resolutions/resolution19.png';
+import resolution20 from 'resources/resolutions/resolution20.png';
 
 const conflicts = [
     conflict01, conflict02, conflict03, conflict04, conflict05, conflict06,
@@ -49,23 +47,18 @@ const conflicts = [
     conflict19, conflict20
 ];
 
-const solutions = [
-    solution01, solution02, solution03, solution04, solution05, solution06,
-    solution07, solution08, solution09, solution10, solution11, solution12,
-    solution13, solution14, solution15, solution16, solution17, solution18,
-    solution19, solution20
-];
-
-const posts = [
-    post01
-];
+const resolutions = [
+    resolution01, resolution02, resolution03, resolution04, resolution05, resolution06,
+    resolution07, resolution08, resolution09, resolution10, resolution11, resolution12,
+    resolution13, resolution14, resolution15, resolution16, resolution17, resolution18,
+    resolution19, resolution20
+]; 
 
 export default function ImageLoader(category) {
     switch(category)
     {
         case 'conflict': return conflicts;
-        case 'solution': return solutions;
-        case 'post': return posts;
+        case 'resolution': return resolutions;
         default: return null;
     }
 }
