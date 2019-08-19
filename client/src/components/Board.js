@@ -1,24 +1,84 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import { connect } from 'react-redux';
-import tile from 'resources/tile.jpg';
 
-const Main = styled.div`
-    background-image: url(${tile});
-    width: ${window.screen.width * 0.9}px;
-    height: ${window.screen.height * 0.7}px;
-    border: 2px solid;
-    box-shadow: 3px 3px 5px 2px rgba(0, 0, 0, 0.35); 
+import ReactSVG from 'react-svg';
+import background from 'resources/SVG/boardBackground.svg';
+import boardLeft from 'resources/SVG/boardLeft.svg';
+import boardLeftHover from 'resources/SVG/boardLeftHover.svg';
+import boardRight from 'resources/SVG/boardRight.svg';
+import boardRightHover from 'resources/SVG/boardRightHover.svg';
+
+import { Post } from 'components';
+
+const Container = styled.div`
+    margin-top: 80px;
+`;
+
+const Side = styled(ReactSVG)`
+    width: 38.9px; 
+    display: inline-block;
+    cursor: pointer; 
+`;
+
+const Content = styled.div`
     display: inline-block;
 `;
 
+const Background = styled(ReactSVG)`
+    width: 950px; 
+`;
+
+// const Item = styled.div`
+//     position: absolute;
+//     left: 600px;
+//     top: 300px;
+// `;
+
+
+// <Item>
+// <Post resource="green" mode={true} likes={[]}/>
+// </Item>
+
 class Board extends Component {
-    render() {  
+    render() {   
         return (
-            <Main className="board">
-                {this.props.items}
-            </Main>
+            <Container>
+                <BoardSide normal={boardLeft} hover={boardLeftHover}/>
+                <Content className="board">
+                    <Background src={background}/>
+                    {this.props.items}
+                </Content>
+                <BoardSide normal={boardRight} hover={boardRightHover}/>
+            </Container>
         );
+    }
+}
+
+class BoardSide extends Component {
+    constructor(props) {
+        super(props);
+        this.state = { isHover: false }
+    }
+
+    handleMouseEnter = (event) => {
+        this.setState({ isHover: true });
+    }
+
+    handleMouseLeave = (event) => {
+        this.setState({ isHover: false });
+    }
+
+    render() {
+        const { normal, hover, handleClick } = this.props;
+        const image = this.state.isHover ? hover : normal;
+
+        return (
+            <Side src={image}
+                onMouseEnter={this.handleMouseEnter}
+                onMouseLeave={this.handleMouseLeave}
+                onClick={handleClick}/>
+        )
     }
 }
 

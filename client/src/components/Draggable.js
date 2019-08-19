@@ -7,9 +7,10 @@ import { connect } from  'react-redux';
 import { attachItemRequest  } from 'modules/post'; 
 import { dragStart, dragEnd } from 'modules/drag';
 
-const Main = styled.div`
-    display: inline-block;
+const Container = styled.div`
     cursor: pointer;
+    z-index: 2;
+    display: inline-block;
 `;
 
 class Draggable extends Component {
@@ -99,9 +100,10 @@ class Draggable extends Component {
                 }
         
                 if (window.confirm('Are you sure, you want to drop this?')) {
-                    const { type, tag } = this.props;
+                    const { category, type, tag } = this.props;
                     const postId = window.location.pathname.split('/').pop();
                     const info = {
+                        category,
                         type,
                         postId,
                         left: this.dragElem.style['left'],
@@ -122,9 +124,9 @@ class Draggable extends Component {
 
     render() {
         return (
-            <Main ref={(c) => { this.sourceElem = c; }} className="draggable">
+            <Container ref={(c) => { this.sourceElem = c; }} className="draggable">
                 {this.props.children}
-            </Main>
+            </Container>
         );
     }
 }

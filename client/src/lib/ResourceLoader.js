@@ -54,11 +54,16 @@ const resolutions = [
     resolution19, resolution20
 ]; 
 
+const posts = [
+    '#e36243', '#f4b139', '#a6cc23', '#26b9cd', '#b17ab2', '#e4aobb' 
+];
+
 export default function ImageLoader(category) {
     switch(category)
     {
         case 'conflict': return conflicts;
         case 'resolution': return resolutions;
+        case 'post': return posts;
         default: return null;
     }
 }

@@ -2,14 +2,13 @@ import React from 'react';
 import styled from 'styled-components';
 
 const Content = styled.img`
-    width: 60px;
-    height: 60px;
+    width: 65px;
+    height: 65px;
 `;
 
-function Symbol({ image }) {
+function Symbol({ resource }) {
     return (
-        <Content className="symbol" src={image} draggable="false">
-        </Content>
+        <Content className="symbol" src={resource} draggable="false"/>
     );
 }
 

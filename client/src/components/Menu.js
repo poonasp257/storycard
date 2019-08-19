@@ -1,30 +1,53 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import Materialize from 'materialize-css';
-
-import { Icon, ItemList, Post, Symbol } from 'components';
+import { ItemList, Post, Symbol } from 'components';
+import ReactSVG from 'react-svg';
+import menuButton from 'resources/SVG/menuButton.svg';
+import menuButtonHover from 'resources/SVG/menuButtonHover.svg';
+import menuBackground from 'resources/SVG/menuBackground.svg';
 
 const Container = styled.div`    
     position: fixed;
-    top: 0px;
-    right: 0px;
-    display: inline-block;
-`;
- 
-const Button = styled.div`
-    top: 0px;
-    right: 0px;
-    height: 60px;
-    margin: 15px;     
+    right: -600px;
+    top: 25%;
+    transition: transform 0.6s ease;
+    transform: translateX(${ props => {
+        if(props.isOpened) return -500;
+        else return 0; 
+    }}px);
+    z-index: 1;
 `;
 
-const Template = styled.div`
-    width: ${window.screen.width * 0.15}px;
-    height: ${window.screen.height * 0.8}px;
-    margin: 15px;
-    padding: 15px;
-    border: 2px solid;
-    background-color: white;
+const Button = styled(ReactSVG)`
+    position: relative;
+    top: 0px;
+    width: 30px;
+    display: inline-block;
+    cursor: pointer;
+`;
+
+const Content = styled.div`   
+    position: relative;
+    display: inline-block;
+`;
+
+const Category = styled.div`
+    position: absolute;
+    left: 100px;
+    top: 10px;
+    font-family: 'Jua', sans-serif;
+    font-size: 32px;
+    color: #7772b4;
+`;
+  
+const MenuBackground = styled(ReactSVG)`
+    width: 600px;
+`;
+
+const ListContainer = styled.div`
+    position: absolute;
+    top: 50px;
+    margin: 50px;
 `;
  
 class Menu extends Component {
@@ -32,98 +55,78 @@ class Menu extends Component {
         super(props); 
 
         this.state = { 
+            isHover: false,
             isOpened: false,
             menu: null
         };
     }    
 
-    componentDidMount() {
-        let elems = document.querySelector('.fixed-action-btn');
-        Materialize.FloatingActionButton.init(elems, {
-            direction: 'left',
-            hoverEnabled: false
-        });
+    handleMouseEnter = (event) => {
+        this.setState({ isHover: true });
     }
 
-    componentWillUnmount() {
-        document.removeEventListener('mousedown', this.closeMenu);
+    handleMouseLeave = (event) => {
+        this.setState({ isHover: false });
     }
 
-    openMenu = (contents) => {        
-        const menu = 
-            <Template>
-                {contents}
-            </Template>;        
-
+    handleMenu = (event) => {
         this.setState({
-            isOpened: true,
-            menu: menu
+            isOpened: !this.state.isOpened,
+            menu: null
         });
-        document.addEventListener('mousedown', this.closeMenu);
-    }
-    
-    closeMenu = (event) => {
+        document.addEventListener('mousedown', this.closeMenu, false);
+    } 
+
+    closeMenu = (event) => {        
         this.setState({
             isOpened: false,
             menu: null
         });
-        document.removeEventListener('mousedown', this.closeMenu);
+        document.removeEventListener('mousedown', this.closeMenu, false);
     }
 
-    openMenuPost = (event) => {
-        const contents = <ItemList category="post" Item={Post} tag="post" targetTag="board"/>;
-        this.openMenu(contents);
-    }
-
-    openMenuConflicts = (event) => {
-        const contents = <ItemList category="conflict" Item={Symbol} tag="symbol" targetTag="board"/>;
-        this.openMenu(contents);
-    }
-
-    openMenuSolutions = (event) => {
-        const contents = <ItemList category="solution" Item={Symbol} tag="symbol" targetTag="board"/>;
-        this.openMenu(contents);
-    }
-    
     render() { 
         return (
-            <Container>
-                <Button className="fixed-action-btn horizontal">
-                    <span className="btn-floating btn-large red">
-                        <Icon type="menu"/>
-                    </span>
-                    <ul>
-                        <li>
-                            <span className="btn-floating">
-                                <Icon type="help"/>
-                            </span>
-                        </li>                        
-                        <li>
-                            <span className="btn-floating blue draken-1">
-                                <Icon type="create" onClick={this.openMenuPost}/>
-                            </span>
-                        </li>
-                        <li>
-                            <span className="btn-floating red darken-1">
-                                <Icon type="sentiment_very_dissatisfied" onClick={this.openMenuConflicts}/>
-                            </span>
-                        </li>
-                        <li>
-                            <span className="btn-floating yellow darken-1">
-                                <Icon type="sentiment_very_satisfied" onClick={this.openMenuSolutions}/>
-                            </span>
-                        </li>
-                        <li>
-                            <span className="btn-floating blue">
-                                <Icon type="lock_open" onClick={this.props.onLogout} />
-                            </span>
-                        </li>
-                    </ul>
-                </Button>
-                {this.state.menu}
+            <Container isOpened={this.state.isOpened}>
+                <MenuButton normal={menuButton} hover={menuButtonHover} handleClick={this.handleMenu}/>
+                <Content>
+                    <Category>갈등</Category>
+                    <MenuBackground src={menuBackground}/>
+                    <ListContainer>
+                        <ItemList category="conflict" Item={Symbol} tag="symbol" targetTag="board"/>
+                        <ItemList category="post" Item={Post} tag="post" targetTag="board"/> 
+                    </ListContainer>
+                </Content>
             </Container>
         );
     };
 };
+
+class MenuButton extends Component {
+    constructor(props) {
+        super(props);
+        this.state = { isHover: false }
+    }
+
+    handleMouseEnter = (event) => {
+        this.setState({ isHover: true });
+    }
+
+    handleMouseLeave = (event) => {
+        this.setState({ isHover: false });
+    }
+
+    render() {
+        const { normal, hover, handleClick } = this.props;
+        const image = this.state.isHover ? hover : normal;
+
+        return (
+            <Button src={image}
+                onMouseEnter={this.handleMouseEnter}
+                onMouseLeave={this.handleMouseLeave}
+                onClick={handleClick}/>
+        )
+    }
+}
 
 export default Menu;

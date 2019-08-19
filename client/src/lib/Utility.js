@@ -58,3 +58,20 @@ export function NumberWithCommas(x) {
 export function Simplification(str) {
     return str.toLowerCase().replace(/ /gi, '');
 }
+
+export function IsKor(value) {
+    if (value.length < 1 || value.length > 6) return false;
+
+    for (let i = 0; i < value.length; ++i) {
+        let ch = value.substr(i, 1);
+
+        ch = escape(ch);
+        if (ch.charAt(1) == "u") {
+            ch = ch.substr(2, (ch.length - 1));
+            if ((ch < "AC00") || (ch > "D7A3")) return false;
+        } 
+        else return false;
+    }
+
+    return true;
+}

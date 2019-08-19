@@ -7,11 +7,22 @@ const SEC =  MSEC * 60;
 const MINUTE = SEC * 60;
 const HOUR = MINUTE * 24;
 
-const Content = styled.h3`
+const opened = `
+    left: 20px; 
+    top: 280px;
+`;
+
+const notOpened = `
+    left: 40px;
+    top: 50px;
+`;
+
+const Container = styled.div`
     position: absolute;
-    left: 50%;
-    top: 10%;
-    transform:translate(-50%, -10%);
+    ${props => props.mode ? opened : notOpened}
+    font-family: 'Space Mono', monospace;
+    font-size: 20px;
+    font-weight: bold;
 `;
 
 class Timer extends Component {    
@@ -31,7 +42,7 @@ class Timer extends Component {
     };
     
     ElipsedTime = () => {
-        if(remainTime <= 0) { 
+        if(this.state.remainTime <= 0) { 
             clearTimeout(this.timerID);
             return;
         }
@@ -55,10 +66,11 @@ class Timer extends Component {
 
     render() {
         const { hour, minute, second } = this.state;
+
         return (
-            <Content className="white-text">
+            <Container mode={this.props.mode}>
                 {Pad(hour, 2)}:{Pad(minute, 2)}:{Pad(second, 2)}
-            </Content>
+            </Container>
         );
     };
 };

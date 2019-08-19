@@ -5,7 +5,7 @@ import axios from 'axios';
 import React from 'react';
 import styled from 'styled-components';
 import { Post, Symbol } from 'components';
-import ImageLoader from 'lib/ImageLoader'; 
+import ResourceLoader from 'lib/ResourceLoader'; 
  
 const ATTACH_ITEM = "post/ATTACH_ITEM";
 const ATTACH_ITEM_SUCCESS = "post/ATTACH_ITEM_SUCCESS";
@@ -42,25 +42,25 @@ function CreatePost(data) {
         left: ${left};
         top: ${top};
     `;
-    const images = ImageLoader('post');
+    const resources = ResourceLoader('post');    
     return (
         <Container className="item">
-            <Post id={_id} image={images[type]} {...props} mode={true} />
+            <Post id={_id} resource={resources[type]} {...props} mode={true}/>
         </Container>
     );
 }
 
 function CreateSymbol(data) {
-    const { type, left, top, ...props } = data;
+    const { category, type, left, top, ...props } = data.info;
     const Container = styled.div`
             position: absolute;
             left: ${left};
             top: ${top};
         `;
-    const images = ImageLoader('symbol');
+    const resources = ResourceLoader(category);
     return (
         <Container className="item">
-            <Symbol image={images[type]} {...props} />
+            <Symbol resource={resources[type]} {...props}/>
         </Container>
     );
 }
@@ -106,10 +106,10 @@ export function editPostRequest(postId, text) {
 
 export function getPostsRequest() {
     return (dispatch) => {
-        dispatch(getItems());
-
+        dispatch(getItems()); 
+ 
         return axios.post('/api/post/getItems/post')
-            .then((response) => {                   
+            .then((response) => {                
                 const posts = response.data.map((post) => {
                     return CreatePost(post);
                 });

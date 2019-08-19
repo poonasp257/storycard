@@ -1,25 +1,41 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import { NumberWithCommas } from 'lib/Utility'; 
+import { NumberWithCommas } from 'lib/Utility';
 
-import { connect } from  'react-redux';
+import { connect } from 'react-redux';
 import { increaseLikeRequest, decreaseLikeRequest } from 'modules/post';
 
-const Content = styled.div`
+import ReactSVG from 'react-svg';
+import heart from 'resources/SVG/heart.svg';
+
+const opened = `
+    left: 20px; 
+    top: 320px;
+`;
+
+const notOpened = `
+    left: 70px;
+    top: 90px;
+`;
+
+const Container = styled.div`
     position: absolute;
-    left: 50%;
-    top: 60%;
-    width: 100%;
-    text-align: center;
-    transform:translate(-50%, -60%);
+    ${props => props.mode ? opened : notOpened}
+    font-family: 'Space Mono', monospace;
+    font-size: 14px;
+    font-weight: bold;
+    display: flex;
+`;
+
+const Heart = styled(ReactSVG)`
+    width: 20px; 
+    display: inline-block;
+    margin-right: 5px;
+    cursor: pointer;
 `;
 
 const Count = styled.div`
-    width: 100%;
-    height: 100%;
-    font-size: 1.7em;
-    display: inline;
-    padding: 0;
+    display: inline-block;
 `;
 
 class Like extends Component {
@@ -35,19 +51,19 @@ class Like extends Component {
     handleClick = () => {
         const { postId, username } = this.props;
 
-        if(this.state.isLiked) { 
+        if (this.state.isLiked) {
             this.props.decreaseLikeRequest(postId, username).then(
                 () => {
-                    if(this.props.status === 'SUCCESS') {
+                    if (this.props.status === 'SUCCESS') {
                         this.setState({ isLiked: false });
                     }
                 }
             );
         }
-        else { 
+        else {
             this.props.increaseLikeRequest(postId, username).then(
-                () => {                    
-                    if(this.props.status === 'SUCCESS') {
+                () => {
+                    if (this.props.status === 'SUCCESS') {
                         this.setState({ isLiked: true });
                     }
                 }
@@ -56,14 +72,11 @@ class Like extends Component {
     }
 
     render() {
-        const heart = this.state.isLiked ? "♥" : "♡";
-
         return (
-            <Content className="white-text" onClick={this.handleClick}>
-                <Count>
-                    {heart} {NumberWithCommas(this.state.likes)}
-                </Count>
-            </Content>
+            <Container mode={this.props.mode}>
+                <Heart src={heart} onClick={this.handleClick}/> 
+                <Count>{NumberWithCommas(this.state.likes)}</Count>
+            </Container>
         );
     };
 };
@@ -77,10 +90,10 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        increaseLikeRequest: (postId, username) => { 
+        increaseLikeRequest: (postId, username) => {
             return dispatch(increaseLikeRequest(postId, username));
         },
-        decreaseLikeRequest: (postId, username) => { 
+        decreaseLikeRequest: (postId, username) => {
             return dispatch(decreaseLikeRequest(postId, username));
         },
     };

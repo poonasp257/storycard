@@ -1,48 +1,87 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router-dom'; 
 import styled from 'styled-components';
 
-import SVG from 'react-svg';
+import ReactSVG from 'react-svg';
 import background from 'resources/SVG/loginBackground.svg';
 import bubble from 'resources/SVG/loginBubble.svg';
 
 const Container = styled.div`
     position: relative;
-    width: 400px;
-    hieght: 400px;
+    width: 450px;
     text-align: center;
     margin: 70px auto;
-    pointer-events: none;
     user-select: none;
 `;
 
-const Logo = styled.div`
+const Logo = styled.div`   
     position: absolute;
-    left: 130px;
-    top: 0px;
-    margin: 5px auto;
-    font-family: 'Jua', sans-serif;
-    font-size: 34px;
+    left: 50%;
+    top: 10px;
+    transform: translate(-50%, 0);
+    font-family: 'Black Han Sans', sans-serif;
+    font-size: 36px;
     color: #fefae7;
+    text-align: left;
+`;
+
+const Content = styled.div`
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
 `;
 
 const InputBoxes = styled.div`
-    position: absolute;
+    margin: 40px auto;
     font-family: 'Space Mono', monospace;
     font-size: 24px;
 `;
 
-const InputBox = styled.div`    
-    width: 250px;
-    height: 100px;
+const InputBox = styled.div`  
+    width: 300px;
+    margin: 20px auto;
 `;
 
-const Label = styled.label`
+const Label = styled.div`
+    text-align: left;
     color: #7772b4;
 `;
 
 const InputField = styled.input`
+    position: absolute;
+    left: 15px;
+    width: 270px;
     color: #e83c18;
+    font: inherit;
+    background-color: transparent;
+    border: none; 
+    :focus {
+        outline: none;
+    }
+`;
+
+const Button = styled.div`  
+    width: 160px;
+    height: 40px;
+    padding: 5px;
+    margin: 10px auto;
+    font-family: 'Black Han Sans', sans-serif;
+    font-size: 36px;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    color: #fefae7;
+    background-color: #e83c18;
+    :hover {
+        color: #e83c18;
+        background-color: #fefae7;
+    }
+`;
+
+const StyledLink = styled(Link)`
+    color: inherit;
+    text-decoration: none;
 `;
 
 class Authentication extends Component {
@@ -62,6 +101,7 @@ class Authentication extends Component {
 
     handleLogin = () => {
         const { username, password } = this.state;
+        if(password === "") return; // error;
 
         this.props.onLogin(username, password).then(
             (success) => {
@@ -100,113 +140,51 @@ class Authentication extends Component {
     }
 
     render() {
-    //     const inputBoxes = (
-    //         <InputBoxes>
-    //             <InputBox>
-    //                 <Label>Username</Label>
-    //                 <SVG src={bubble}/>
-    //                 <InputField name="username" type="text" className="validate" value={this.state.username}
-    //                     onChange={this.handleChange}/>
-    //             </InputBox>                
-    //             <InputBox>
-    //                 <Label>Password</Label>
-    //                 <SVG src={bubble}/>
-    //                 <InputField name="password" type="password" className="validate" value={this.state.password}
-    //                     onChange={this.handleChange} onKeyPress={this.handleKeyPress}/>
-    //             </InputBox>
-    //         </InputBoxes>
-    //     );
-
-    //     const signInView = (
-    //         <div>
-    //             {inputBoxes}
-    //         </div>
-    //     );
-
-    //     const signUpView = (
-    //         <div>
-                
-    //         </div>
-    //     );
-
-        
-const inputBoxes = (
-    <div>
-        <div className="input-field col s12 username">
-            <label>Username</label>
-            <input name="username" type="text" className="validate" value={this.state.username}
-                onChange={this.handleChange}/>
-        </div>
-        <div className="input-field col s12">
-            <label>Password</label>
-            <input name="password" type="password" className="validate" value={this.state.password}
-                onChange={this.handleChange} onKeyPress={this.handleKeyPress}/>
-        </div>
-    </div>
-);
-
+        const inputBoxes = (
+            <InputBoxes>
+                <InputBox>
+                    <Label>Username</Label>
+                    <InputField name="username" type="text" value={this.state.username}
+                        onChange={this.handleChange} autoComplete="off"/>
+                    <ReactSVG src={bubble}/>
+                </InputBox>
+                <InputBox>
+                    <Label>Password</Label>
+                    <InputField name="password" type="password" value={this.state.password}
+                        onChange={this.handleChange} onKeyPress={this.handleKeyPress}/>
+                    <ReactSVG src={bubble}/>
+                </InputBox>
+            </InputBoxes>
+        );
 
         const signInView = (
-            <div>
-                <div className="card-content">
-                    <div className="row">
-                        {inputBoxes}
-                        <button className="waves-effect waves-light btn"
-                            onClick={this.handleLogin}>SUBMIT</button>
-                    </div>
-                </div>
-                <div className="footer">
-                    <div className="card-content">
-                        <div className="right" >
-                        New Here? <Link to="/signup">Create account</Link>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <Content>
+                {inputBoxes}                
+                <Button onClick={this.handleLogin}>로그인</Button>
+                <Button><StyledLink to="/signup">회원가입</StyledLink></Button>
+            </Content>
         );
 
         const signUpView = (
-            <div className="card-content">
-                <div className="row">
-                    {inputBoxes}
-                    <button className="waves-effect waves-light btn"
-                        onClick={this.handleRegister}>CREATE</button>
-                </div>
-            </div>
+            <Content>                    
+                {inputBoxes}                
+                <Button onClick={this.handleRegister}>회원가입</Button>
+            </Content>
         );
 
         return (
-            <div className="container auth">
-                <Link className="logo" to="/">STORYCARD</Link>
-                <div className="card">
-                    <div className="header blue white-text center">
-                        <div className="card-content">{this.props.mode ? "SIGNIN" : "SIGNUP"}</div>
-                    </div>
-                    {this.props.mode ? signInView : signUpView }
-                </div>
-            </div>
+            <Container>
+                <ReactSVG src={background} />
+                <Logo>스토리카드.</Logo>
+                {this.props.mode ? signInView : signUpView}
+            </Container>
         );
+    }
+}
 
-        
-    //     <Container>
-    //     <SVG src={background}/>
-    //     <Logo className="logo">스토리카드.</Logo>
-    //     {this.props.mode ? signInView : signUpView }
-    // </Container>
 
-        return (            
-            <div className="container auth">
-                <Link className="logo" to="/">STORYCARD</Link>
-                <div className="card">
-                    <div className="header blue white-text center">
-                        <div className="card-content">{this.props.mode ? "SIGNIN" : "SIGNUP"}</div>
-                    </div>
-                    {this.props.mode ? signInView : signUpView }
-                </div>
-            </div>
-        );
-    };
-};
+
+           
+
 
 export default Authentication;
-        

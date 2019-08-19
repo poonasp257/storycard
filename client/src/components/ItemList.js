@@ -1,14 +1,11 @@
 import React from 'react';
 import styled from 'styled-components';
-import ImageLoader from 'lib/ImageLoader';
+import ResourceLoader from 'lib/ResourceLoader';
 import { Draggable } from 'components';
-
-const Category = styled.div`
-    text-align: left;
-    font-size: 3em;
+ 
+const Container = styled.div`  
+    display: inline-block;
 `;
-
-const Container = styled.div``;
 
 const Content = styled.div`
     float: left;
@@ -17,13 +14,13 @@ const Content = styled.div`
 
 function ItemList({ category, Item, tag, targetTag }) {
     let items = [];
-    const images = ImageLoader(category);
+    const resources = ResourceLoader(category);
 
-    for(let i = 0; i < images.length; ++i) {
+    for(let i = 0; i < resources.length; ++i) {
         items.push(
             <Content key={items.length}>
-                <Draggable type={i} tag={tag} targetTag={targetTag}>
-                    <Item image={images[i]} mode={false}/>
+                <Draggable category={category} type={i} tag={tag} targetTag={targetTag}>
+                    <Item resource={resources[i]} mode={false}/>
                 </Draggable>
             </Content>
         );
@@ -31,7 +28,6 @@ function ItemList({ category, Item, tag, targetTag }) {
 
     return (
         <Container>
-            <Category>{category.toUpperCase()}</Category>
             {items}
         </Container>
     );

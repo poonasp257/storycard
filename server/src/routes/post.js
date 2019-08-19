@@ -36,27 +36,24 @@ router.post('/attach/post', (req, res) => {
     posts.push(post);
     post.save(err => {
         if (err) throw err;
-        return res.json({
-            id: post._id,
-            success: true
-        });
+        return res.json({ success: true });
     });
  
     req.io.sockets.emit('attached/post', post);
 });
 
 router.post('/attach/symbol', (req, res) => {
-    const { type, postId, left, top } = req.body;
+    const { postId, ...info } = req.body;
     const index = posts.findIndex((post) => { return post.id === postId });
-
-    posts[index].symbols.push({ type, left, top });
-    Post.updateOne({ id: postId }, { $push: { symbols: { type, left, top } } }, (err) => {
+ 
+    posts[index].symbols.push({ info });
+    Post.updateOne({ id: postId }, { $push: { symbols: { info } } }, (err) => {
         if (err) throw err;
 
         return res.json({ success: true });
     });
 
-    req.io.sockets.emit('attached/symbol', { type, left, top });
+    req.io.sockets.emit('attached/symbol', { info });
 });
 
 router.post('/delete', (req, res) => {
