@@ -9,14 +9,13 @@ import boardLeftHover from 'resources/SVG/boardLeftHover.svg';
 import boardRight from 'resources/SVG/boardRight.svg';
 import boardRightHover from 'resources/SVG/boardRightHover.svg';
 
-import { Post } from 'components';
-
+//80
 const Container = styled.div`
-    margin-top: 80px;
+    margin-top: 50px;
 `;
-
+//38.9
 const Side = styled(ReactSVG)`
-    width: 38.9px; 
+    width: 28.6px; 
     display: inline-block;
     cursor: pointer; 
 `;
@@ -26,8 +25,10 @@ const Content = styled.div`
 `;
 
 const Background = styled(ReactSVG)`
-    width: 950px; 
+    width: 700px; 
 `;
+
+// 950
 
 // const Item = styled.div`
 //     position: absolute;

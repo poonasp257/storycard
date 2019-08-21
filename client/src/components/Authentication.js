@@ -6,9 +6,10 @@ import ReactSVG from 'react-svg';
 import background from 'resources/SVG/loginBackground.svg';
 import bubble from 'resources/SVG/loginBubble.svg';
 
+//450
 const Container = styled.div`
     position: relative;
-    width: 450px;
+    width: 400px;
     text-align: center;
     margin: 70px auto;
     user-select: none;

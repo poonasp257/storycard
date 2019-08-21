@@ -49,7 +49,6 @@ router.post('/attach/symbol', (req, res) => {
     posts[index].symbols.push({ info });
     Post.updateOne({ id: postId }, { $push: { symbols: { info } } }, (err) => {
         if (err) throw err;
-
         return res.json({ success: true });
     });
 
@@ -68,7 +67,6 @@ router.post('/delete', (req, res) => {
     posts.splice(index, 1);
     Post.deleteOne({ _id: postId, username: username }, (err) => {
         if (err) throw err;
-
         return res.json({ success: true });
     }); 
 
@@ -87,38 +85,39 @@ router.post('/edit', (req, res) => {
     posts[index].text = text;
     Post.updateOne({ _id: postId, username: username }, { $set: { text: text } }, (err) => {
         if (err) throw err;
-
         return res.json({ success: true });
     });
 
-    req.io.sockets.emit('edit', { index, info: posts[index] });
+    req.io.sockets.emit('update', { index, info: posts[index] });
 });
 
+//likes = [ 'poona', 'test', 'hello', ...other usernames ];
 router.post('/like', (req, res) => {
-    const { postId } = req.body;
-    const username = req.session.loginInfo.username;
-    const index = posts.findIndex((post) => {
-        return post.id === postId
-            && post.username === username;
+    const { postId, username } = req.body;
+    const index = posts.findIndex(post => { 
+        return post.id === postId;
     });
     if (index < 0) return res.json({ success: false });
 
-    Post.updateOne({ _id: postId }, { $push: { likes: username } }, (err) => {
-        if (err) throw err;
-
-        return res.json({ success: true });
+    const isExist = posts[index].likes.findIndex(like => {
+        return like === username;
     });
-});
+    if(isExist < 0) { 
+        posts[index].likes.push(username);
+        Post.updateOne({ _id: postId }, { $push: { likes: username } }, (err) => {
+            if (err) throw err;
+            return res.json({ success: true });
+        });
+    }
+    else { 
+        posts[index].likes.splice(isExist, 1);
+        Post.updateOne({ _id: postId}, { $pull: { likes: username } }, (err) => {
+            if(err) throw err;
+            return res.json({ success: true });
+        });
+    }
 
-router.post('/dislike', (req, res) => {
-    const { postId } = req.body;
-    const username = req.session.loginInfo.username;
-
-    Post.updateOne({ _id: postId }, { $pull: { likes: username } }, (err) => {
-        if (err) throw err;
-
-        return res.json({ success: true });
-    });
+    req.io.sockets.emit('update', { index, info: posts[index] });
 });
 
 export default router;

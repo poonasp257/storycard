@@ -9,7 +9,7 @@ import menuBackground from 'resources/SVG/menuBackground.svg';
 const Container = styled.div`    
     position: fixed;
     right: -600px;
-    top: 25%;
+    top: 8%;
     transition: transform 0.6s ease;
     transform: translateX(${ props => {
         if(props.isOpened) return -500;
@@ -21,7 +21,7 @@ const Container = styled.div`
 const Button = styled(ReactSVG)`
     position: relative;
     top: 0px;
-    width: 30px;
+    width: 25px;
     display: inline-block;
     cursor: pointer;
 `;

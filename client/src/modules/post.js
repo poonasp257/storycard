@@ -33,7 +33,7 @@ const GET_ITEMS_FAILURE = "post/GET_ITEMS_FAILURE";
 
 const LISTEN_GET_ITEM = "post/LISTEN_GET_ITEM";
 const LISTEN_DELETE_ITEM = "post/LISTEN_DELETE_ITEM";
-const LISTEN_EDIT_POST = "post/LISTEN_EDIT_POST"; 
+const LISTEN_UPDATE_POST = "post/LISTEN_EDIT_POST"; 
 
 function CreatePost(data) {
     const { _id, type, left, top, ...props } = data;
@@ -180,10 +180,10 @@ export function updateItems(socket) {
             dispatch({ type: LISTEN_DELETE_ITEM, payload: index });
         });
 
-        socket.on('edit', (data) => {
+        socket.on('update', (data) => {
             const { index, info } = data;
             const post = CreatePost(info);
-            dispatch({ type: LISTEN_EDIT_POST, payload: { index, post } })
+            dispatch({ type: LISTEN_UPDATE_POST, payload: { index, post } })
         });
     }
 }
@@ -343,7 +343,7 @@ export default handleActions({
         const index = action.payload;
         return state.update('items', items => items.splice(index, 1));
     },
-    [LISTEN_EDIT_POST]: (state, action) => {
+    [LISTEN_UPDATE_POST]: (state, action) => {
         const { index, post } = action.payload;
         return state.setIn(['items', index], post);
     }

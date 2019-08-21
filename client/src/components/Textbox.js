@@ -98,7 +98,7 @@ class TextBox extends Component {
                     <div onClick={this.handleDelete}>delete</div>
                 </ButtonList>
             </div>
-            : <LinesEllipsis text={description} maxLine='6' 
+            : <LinesEllipsis text={description} 
                 ellipsis='...' basedOn='letters'/>;
 
         return (
