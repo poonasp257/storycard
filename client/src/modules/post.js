@@ -4,8 +4,8 @@ import axios from 'axios';
 
 import React from 'react';
 import styled from 'styled-components';
-import { Post, Symbol } from 'components';
 import ResourceLoader from 'lib/ResourceLoader'; 
+import { Post, Symbol } from 'components';
  
 const ATTACH_ITEM = "post/ATTACH_ITEM";
 const ATTACH_ITEM_SUCCESS = "post/ATTACH_ITEM_SUCCESS";
@@ -15,13 +15,9 @@ const DELETE_ITEM = "post/DELETE_ITEM";
 const DELETE_ITEM_SUCCESS = "post/DELETE_ITEM_SUCCESS";
 const DELETE_ITEM_FAILURE = "post/DELETE_ITEM_FAILURE";
 
-const INC_LIKE = "post/INC_LIKE";
-const INC_LIKE_SUCCESS = "post/INC_LIKE_SUCCESS";
-const INC_LIKE_FAILURE = "post/INC_LIKE_FAILURE";
-
-const DEC_LIKE = "post/DEC_LIKE";
-const DEC_LIKE_SUCCESS = "post/DEC_LIKE_SUCCESS";
-const DEC_LIKE_FAILURE = "post/DEC_LIKE_FAILURE";
+const LIKE = "post/INC_LIKE";
+const LIKE_SUCCESS = "post/INC_LIKE_SUCCESS";
+const LIKE_FAILURE = "post/INC_LIKE_FAILURE";
 
 const EDIT_POST = "post/EDIT_POST";
 const EDIT_POST_SUCCESS = "post/EDIT_POST_SUCCESS";
@@ -33,36 +29,33 @@ const GET_ITEMS_FAILURE = "post/GET_ITEMS_FAILURE";
 
 const LISTEN_GET_ITEM = "post/LISTEN_GET_ITEM";
 const LISTEN_DELETE_ITEM = "post/LISTEN_DELETE_ITEM";
-const LISTEN_UPDATE_POST = "post/LISTEN_EDIT_POST"; 
+const LISTEN_UPDATE_ITEM = "post/LISTEN_EDIT_POST"; 
 
-function CreatePost(data) {
-    const { _id, type, left, top, ...props } = data;
+function CreateItem(info) {
+    const { _id, category, type, left, top, ...props } = info;
     const Container = styled.div`
         position: absolute;
         left: ${left};
         top: ${top};
     `;
-    const resources = ResourceLoader('post');    
-    return (
-        <Container className="item">
-            <Post id={_id} resource={resources[type]} {...props} mode={true}/>
-        </Container>
-    );
-}
+    const resources = ResourceLoader(category);    
+    let Type = null;
 
-function CreateSymbol(data) {
-    const { category, type, left, top, ...props } = data.info;
-    const Container = styled.div`
-            position: absolute;
-            left: ${left};
-            top: ${top};
-        `;
-    const resources = ResourceLoader(category);
-    return (
+    switch(category)
+    {
+        case 'post': Type = Post; break;
+        case 'resolution':
+        case 'conflict': Type = Symbol; break;
+        default: return null;
+    }
+
+    const item = (
         <Container className="item">
-            <Symbol resource={resources[type]} {...props}/>
+            <Type id={_id} resource={resources[type]} {...props}/>
         </Container>
     );
+
+    return Map({ content: item, info: Map({ id: _id, left, top, ...props }) });
 }
 
 export function attachItemRequest(tag, info) {
@@ -104,86 +97,50 @@ export function editPostRequest(postId, text) {
     }
 }
 
-export function getPostsRequest() {
+export function getItemsRequest({ tag, postId }) {    
     return (dispatch) => {
         dispatch(getItems()); 
  
-        return axios.post('/api/post/getItems/post')
+        return axios.post(`/api/post/getItems/${tag}`, { postId })
             .then((response) => {                
-                const posts = response.data.map((post) => {
-                    return CreatePost(post);
+                const items = response.data.map((info) => {
+                    return CreateItem(info);
                 });
                 
-                dispatch(getItemsSuccess(posts));
+                dispatch(getItemsSuccess(items));
             }).catch((error) => {
                 dispatch(getItemsFailure(error.response.data.code));
             });
     }
 }
 
-export function getSymbolsRequest(postId) {    
+export function LikeRequest(postId, index) {
     return (dispatch) => {
-        dispatch(getItems());
+        dispatch(Like());
 
-        return axios.post('/api/post/getItems/symbol', { postId })
-            .then((response) => {                   
-                const symbols = response.data.map((symbol) => {
-                    return CreateSymbol(symbol);
-                });
-
-                dispatch(getItemsSuccess(symbols));
-            }).catch((error) => {
-                dispatch(getItemsFailure(error.response.data.code));
-            });
-    }
-}
-
-export function increaseLikeRequest(postId) {
-    return (dispatch) => {
-        dispatch(increaseLike());
-
-        return axios.post('/api/post/like', { postId })
+        return axios.post('/api/post/like', { postId, index })
         .then(() => {
-            dispatch(increaseLikeSuccess());
+            dispatch(LikeSuccess());
         }).catch((error) => {
-            dispatch(increaseLikeFailure(error.response.data.code));
-        });
-    }
-}
-
-export function decreaseLikeRequest(postId) {
-    return (dispatch) => {
-        dispatch(decreaseLike());
-
-        return axios.post('/api/post/dislike', { postId })
-        .then(() => {
-            dispatch(decreaseLikeSuccess());
-        }).catch((error) => {
-            dispatch(decreaseLikeFailure(error.response.data.code));
+            dispatch(LikeFailure(error.response.data.code));
         });
     }
 }
 
 export function updateItems(socket) {
     return (dispatch) => {
-        socket.on('attached/post', (data) => {
-            const post = CreatePost(data);
-            dispatch({ type: LISTEN_GET_ITEM, payload: post });
+        socket.on('attach', (data) => {
+            const item = CreateItem(data);
+            dispatch({ type: LISTEN_GET_ITEM, payload: item });
         });
-
-        socket.on('attached/symbol', (data) => {
-            const symbol = CreateSymbol(data);
-            dispatch({ type: LISTEN_GET_ITEM, payload: symbol });
-        });
-
+        
         socket.on('delete', (index) => {
             dispatch({ type: LISTEN_DELETE_ITEM, payload: index });
         });
 
         socket.on('update', (data) => {
             const { index, info } = data;
-            const post = CreatePost(info);
-            dispatch({ type: LISTEN_UPDATE_POST, payload: { index, post } })
+            dispatch({ type: LISTEN_UPDATE_ITEM, payload: { index, newInfo: info } });
         });
     }
 }
@@ -200,13 +157,9 @@ export const editPost = createAction(EDIT_POST);
 export const editPostSuccess = createAction(EDIT_POST_SUCCESS);
 export const editPostFailure = createAction(EDIT_POST_FAILURE);
 
-export const increaseLike = createAction(INC_LIKE);
-export const increaseLikeSuccess = createAction(INC_LIKE_SUCCESS);
-export const increaseLikeFailure = createAction(INC_LIKE_FAILURE);
-
-export const decreaseLike = createAction(DEC_LIKE);
-export const decreaseLikeSuccess = createAction(DEC_LIKE_SUCCESS);
-export const decreaseLikeFailure = createAction(DEC_LIKE_FAILURE);
+export const Like = createAction(LIKE);
+export const LikeSuccess = createAction(LIKE_SUCCESS);
+export const LikeFailure = createAction(LIKE_FAILURE);
 
 export const getItems = createAction(GET_ITEMS);
 export const getItemsSuccess = createAction(GET_ITEMS_SUCCESS); // posts
@@ -303,38 +256,22 @@ export default handleActions({
             error: error
         }));
     },
-    [INC_LIKE]: (state, action) => {
+    [LIKE]: (state, action) => {
         return state.set('like', Map({
             status: 'WAITING',
             error: -1
         }));
     },
-    [INC_LIKE_SUCCESS]: (state, action) => {
+    [LIKE_SUCCESS]: (state, action) => {
         return state.setIn(['like', 'status'], 'SUCCESS');
     },
-    [INC_LIKE_FAILURE]: (state, action) => {
+    [LIKE_FAILURE]: (state, action) => {
         const error = action.payload;
         return state.set('like', Map({
             status: 'FAILURE',
             error: error
         }));
     },
-    [DEC_LIKE]: (state, action) => {
-        return state.set('like', Map({
-            status: 'WAITING',
-            error: -1
-        }));
-    },
-    [DEC_LIKE_SUCCESS]: (state, action) => {
-        return state.setIn(['like', 'status'], 'SUCCESS');
-    },
-    [DEC_LIKE_FAILURE]: (state, action) => {
-        const error = action.payload;
-        return state.set('info', Map({
-            status: 'FAILURE',
-            error: error
-        }));
-    },    
     [LISTEN_GET_ITEM]: (state, action) => {
         const item = action.payload;
         return state.update('items', items => items.push(item));
@@ -343,8 +280,14 @@ export default handleActions({
         const index = action.payload;
         return state.update('items', items => items.splice(index, 1));
     },
-    [LISTEN_UPDATE_POST]: (state, action) => {
-        const { index, post } = action.payload;
-        return state.setIn(['items', index], post);
+    [LISTEN_UPDATE_ITEM]: (state, action) => {
+        const { index, newInfo } = action.payload;
+        const KEYS = [ 'text', 'likes' ];    
+
+        return state.updateIn(['items', index, 'info'], info => {
+            return KEYS.reduce((map, key) => {
+                return map.set(key, newInfo[key]) 
+            }, info);
+        });
     }
 }, initialState);

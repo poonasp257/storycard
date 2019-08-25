@@ -2,33 +2,66 @@ import React from 'react';
 import styled from 'styled-components';
 import ResourceLoader from 'lib/ResourceLoader';
 import { Draggable } from 'components';
- 
-const Container = styled.div`  
-    display: inline-block;
+
+import ReactSVG from 'react-svg';
+
+const Container = styled.div`
+    position: relative;
+    margin: 20px auto;
 `;
 
-const Content = styled.div`
+const Background = styled(ReactSVG)`
+    width: 350px;
+`;
+
+const Category = styled.span`
+    position: absolute;
+    left: 25px;
+    top: 5px;
+    color: #fefae7;
+    font-size: 21px; 
+    font-family: 'Do Hyeon', sans-serif;
+`;
+
+const List = styled.div`
+    position: absolute;
+    left: 0px;
+    top: 30px;
+    width: 350px;
+    margin: 10px;
+`;
+
+const ItemContainer = styled.div`
     float: left;
     margin: 10px;
 `;
 
-function ItemList({ category, Item, tag, targetTag }) {
+const LAGNGUAGE = {
+    'conflict': '갈등',
+    'resolution': '해결',
+    'post': '직접입력'
+};
+
+function ItemList({ bg, category, Item, tag, targetTag }) {
     let items = [];
     const resources = ResourceLoader(category);
 
     for(let i = 0; i < resources.length; ++i) {
         items.push(
-            <Content key={items.length}>
+            <ItemContainer key={items.length}>
                 <Draggable category={category} type={i} tag={tag} targetTag={targetTag}>
                     <Item resource={resources[i]} mode={false}/>
                 </Draggable>
-            </Content>
+            </ItemContainer>
         );
     }
 
+    let translatedCategory = LAGNGUAGE[category];
     return (
         <Container>
-            {items}
+            <Background src={bg}/>
+            <Category>{translatedCategory}</Category>
+            <List>{items}</List>
         </Container>
     );
 };

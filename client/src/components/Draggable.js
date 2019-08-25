@@ -9,8 +9,6 @@ import { dragStart, dragEnd } from 'modules/drag';
 
 const Container = styled.div`
     cursor: pointer;
-    z-index: 2;
-    display: inline-block;
 `;
 
 class Draggable extends Component {
@@ -45,6 +43,7 @@ class Draggable extends Component {
             position: absolute;
             left: ${this.fixedX}px;
             top: ${this.fixedY}px;
+            z-index: 2;
         `);
     };
 
@@ -102,12 +101,17 @@ class Draggable extends Component {
                 if (window.confirm('Are you sure, you want to drop this?')) {
                     const { category, type, tag } = this.props;
                     const postId = window.location.pathname.split('/').pop();
+                    const size = ((tag === 'post') ? collider.width : collider.width / 4) * 1.3; 
+                    const left = parseInt(this.dragElem.style['left'], 10) 
+                        - targetCollider.left - size;
+                    const top = parseInt(this.dragElem.style['top'], 10) 
+                        - targetCollider.top - size;
                     const info = {
                         category,
                         type,
                         postId,
-                        left: this.dragElem.style['left'],
-                        top: this.dragElem.style['top']
+                        left: `${left}px`,
+                        top: `${top}px`
                     };
 
                     this.props.attachItemRequest(tag, info).then(

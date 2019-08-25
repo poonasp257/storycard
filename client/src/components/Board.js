@@ -2,84 +2,91 @@ import React, { Component } from 'react';
 import styled from 'styled-components';
 import { connect } from 'react-redux';
 
-import ReactSVG from 'react-svg';
-import background from 'resources/SVG/boardBackground.svg';
-import boardLeft from 'resources/SVG/boardLeft.svg';
-import boardLeftHover from 'resources/SVG/boardLeftHover.svg';
-import boardRight from 'resources/SVG/boardRight.svg';
-import boardRightHover from 'resources/SVG/boardRightHover.svg';
+import background from 'resources/PNG/board-paper.png';
 
-//80
-const Container = styled.div`
-    margin-top: 50px;
-`;
-//38.9
-const Side = styled(ReactSVG)`
-    width: 28.6px; 
-    display: inline-block;
-    cursor: pointer; 
+const OutContainer = styled.div`
+    width: ${window.innerWidth}px;
+    height: ${window.innerHeight}px;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    ::-webkit-scrollbar { display: none; }
 `;
 
-const Content = styled.div`
-    display: inline-block;
+const InContainer = styled.div`
+    position: relative;
+    width: ${props => props.width}px;
+    height: ${window.innerHeight}px;
+    background: url(${background}) repeat-x;
+    background-size: contain;
 `;
 
-const Background = styled(ReactSVG)`
-    width: 700px; 
+const DropZone = styled.div`
+    position: absolute;
+    top: 40%;
+    width: ${props => props.width}px;
+    height: ${window.innerHeight * 0.75}px;
+    transform: translate(0, -40%);
 `;
-
-// 950
-
-// const Item = styled.div`
-//     position: absolute;
-//     left: 600px;
-//     top: 300px;
-// `;
-
-
-// <Item>
-// <Post resource="green" mode={true} likes={[]}/>
-// </Item>
 
 class Board extends Component {
-    render() {   
-        return (
-            <Container>
-                <BoardSide normal={boardLeft} hover={boardLeftHover}/>
-                <Content className="board">
-                    <Background src={background}/>
-                    {this.props.items}
-                </Content>
-                <BoardSide normal={boardRight} hover={boardRightHover}/>
-            </Container>
-        );
-    }
-}
-
-class BoardSide extends Component {
     constructor(props) {
         super(props);
-        this.state = { isHover: false }
+
+        this.ref = null;
+        this.state = {
+            scrollLeft: 0,
+            width: window.innerWidth * 2,
+            items: null,
+            contents: null
+        };
     }
 
-    handleMouseEnter = (event) => {
-        this.setState({ isHover: true });
+    handleWheel = (event) => {
+        const delta = event.nativeEvent.wheelDelta;
+        const maxScrollLeft = this.ref.scrollWidth - this.ref.clientWidth;
+        let boardWidth = this.state.width;
+
+        this.ref.scrollLeft -= delta;
+        if (maxScrollLeft * 0.8 < this.ref.scrollLeft) {
+            boardWidth *= 2;
+        }
+
+        this.setState({ 
+            width: boardWidth,
+            scrollLeft: this.ref.scrollLeft 
+        });
     }
 
-    handleMouseLeave = (event) => {
-        this.setState({ isHover: false });
+    static getDerivedStateFromProps(nextProps, prevState) {
+        const items = nextProps.items;
+        let contents = [];
+
+        items.map(item => {
+            const itemLeft = parseInt(item.getIn(['info', 'left']), 10);
+            
+            if (prevState.scrollLeft - window.innerWidth < itemLeft
+                && itemLeft < prevState.scrollLeft + window.innerWidth) {
+                contents.push(item.get('content'));
+            }
+        });
+
+        return { items: items, contents: contents };
+    }
+
+    shouldComponentUpdate(nextProps, nextState) {
+        return JSON.stringify(nextState) != JSON.stringify(this.state);
     }
 
     render() {
-        const { normal, hover, handleClick } = this.props;
-        const image = this.state.isHover ? hover : normal;
-
         return (
-            <Side src={image}
-                onMouseEnter={this.handleMouseEnter}
-                onMouseLeave={this.handleMouseLeave}
-                onClick={handleClick}/>
-        )
+            <OutContainer ref={r => this.ref = r} onWheel={this.handleWheel}>
+                <InContainer width={this.state.width}>
+                    <DropZone className="board" width={this.state.width}>
+                        {this.state.contents}
+                    </DropZone>
+                </InContainer>
+            </OutContainer>
+        );
     }
 }
 

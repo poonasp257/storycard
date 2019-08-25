@@ -1,40 +1,27 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import { Link } from 'react-router-dom';
 import $ from 'jquery';
 import Materialize from 'materialize-css';
-import { Menu, Board } from 'components';
+import { Toolkit, Board, Icon } from 'components';
 import { connect } from 'react-redux';
 import { getStatusRequest, logoutRequest } from 'modules/authentication';
-import { getPostsRequest, getSymbolsRequest, updateItems } from 'modules/post'; 
+import { getItemsRequest, updateItems } from 'modules/post';
 import io from 'socket.io-client';
 
-import ReactSVG from 'react-svg';
-import back from 'resources/SVG/back.svg';
-import backHover from 'resources/SVG/backHover.svg';
-
 const Container = styled.div`
-    position: relative;
-    user-select: none;
-    text-align: center;
+    margin: 45px auto;
 `;
 
 const Header = styled.div`
-    height: 120px;
-    background-color: #f5c620;
+    position: fixed;
+    margin-left: 220px;
+    z-index: 1;
 `;
 
-const Title = styled(Link)`  
-    position: absolute;
-    left: 50%;
-    top: 35px;
-    transform: translate(-50%, 0);
-    width: 170px;
-    height: 40px;
-    padding-top: 10px;
-    text-decoration: none;
-    font-family: 'Black Han Sans', sans-serif;
-    font-size: 28px;
+const Button = styled.div`  
+    display: inline-block;   
+    margin: 3px; 
+    padding: 3px;
     border: none;
     border-radius: 30px;
     cursor: pointer;
@@ -46,41 +33,42 @@ const Title = styled(Link)`
     }
 `;
 
-const Button = styled(ReactSVG)`
-    position: absolute;
-    left: 250px;
-    top: 30px;
-    width: 50px;
-    cursor: pointer;
+const Name = styled.span`    
+    margin-left: 5px;
+    margin-right: 10px;   
+    vertical-align: top;
+    font-size: 18px;
+    font-family: 'Space Mono', monospace;
 `;
 
 class Main extends Component {
     constructor(props) {
         super(props);
- 
+
         this.socket = io.connect('http://localhost:5000');
     }
 
-    handleLogin = () => {        
+    handleLogin = () => {
         function getCookie(name) {
             var value = "; " + document.cookie;
             var parts = value.split("; " + name + "=");
             if (parts.length === 2) return parts.pop().split(";").shift();
         }
 
-        let loginData = getCookie('key'); 
-        if (typeof loginData === "undefined") { 
-            window.location.href = "/signin";
-            return false;
-        }
-
-        loginData = JSON.parse(atob(loginData));
-        if (!loginData.isLoggedIn) { 
-            window.location.href = "/signin";
-            return false;
-        }
-
         return new Promise((resolve, reject) => {
+            let loginData = getCookie('key');
+            if (typeof loginData === "undefined") {
+                console.log('login data undefined')
+                window.location.href = "/signin";
+                reject(false);
+            }
+
+            loginData = JSON.parse(atob(loginData));
+            if (!loginData.isLoggedIn) {
+                window.location.href = "/signin";
+                reject(false);
+            }
+
             this.props.getStatusRequest().then(
                 () => {
                     if (!this.props.status.auth.get('valid')) {
@@ -108,32 +96,22 @@ class Main extends Component {
         this.props.logoutRequest().then(
             () => {
                 document.cookie = '';
-                Materialize.toast({ html: 'Good Bye!'});
+                Materialize.toast({ html: 'Good Bye!' });
                 window.location.href = "/signin";
             }
         );
     }
 
     getItems = () => {
-        const { postId } = this.props.match.params;
-        
-        // Home
-        if(postId === undefined) {
-            this.props.getPostsRequest().then(
-                () => {
+        const postId = this.props.location.pathname.split('/').pop();        
+        const info = (postId === 'main') ? { tag: 'post' } : { tag: 'symbol', postId: postId };
 
-                }   
-            );
-        }
-        else { // Post page
-            this.props.getSymbolsRequest(postId).then(
-                () => {
+        this.props.getItemsRequest(info).then(
+            () => {
 
-                }
-            );
-        }
+            });
     }
-    
+
     componentDidMount() {
         this.handleLogin().then(
             (success) => {
@@ -153,43 +131,20 @@ class Main extends Component {
         return (
             <Container>
                 <Header>
-                    <BackButton normal={back} hover={backHover} handleClick={this.handleLogout}/>
-                    <Title to="/">스토리카드.</Title>
+                    <Button onClick={() => window.location.href = '/main'}>
+                        <Icon type="home" size="24px" />
+                    </Button>
+                    <Button onClick={this.handleLogout}>
+                        <Icon type="person" size="24px"/>
+                        <Name>Logout</Name>
+                    </Button>
                 </Header>
-                <Menu/>
-                <Board/>
+                <Toolkit />
+                <Board />
             </Container>
         );
     };
 };
-
-class BackButton extends Component {
-    constructor(props) {
-        super(props);
-        this.state = { isHover: false }
-    }
-
-    handleMouseEnter = (event) => {
-        this.setState({ isHover: true });
-    }
-
-    handleMouseLeave = (event) => {
-        this.setState({ isHover: false });
-    }
-    
-    render() {
-        const { normal, hover, handleClick } = this.props;
-        const image = this.state.isHover ? hover : normal;
-
-        return (
-            <Button src={image}
-                onMouseEnter={this.handleMouseEnter}
-                onMouseLeave={this.handleMouseLeave}
-                onClick={handleClick}/>
-        )
-    }
-}
-
 
 const mapStateToProps = (state) => {
     return {
@@ -208,11 +163,8 @@ const mapDispatchToProps = (dispatch) => {
         logoutRequest: () => {
             return dispatch(logoutRequest());
         },
-        getPostsRequest: () => {
-            return dispatch(getPostsRequest());
-        },
-        getSymbolsRequest: (postId) => {
-            return dispatch(getSymbolsRequest(postId));
+        getItemsRequest: (info) => {
+            return dispatch(getItemsRequest(info));
         },
         updateItems: (socket) => dispatch(updateItems(socket))
     };

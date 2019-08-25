@@ -1,46 +1,43 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom'; 
+import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
 import ReactSVG from 'react-svg';
 import background from 'resources/SVG/loginBackground.svg';
 import bubble from 'resources/SVG/loginBubble.svg';
 
-//450
 const Container = styled.div`
     position: relative;
     width: 400px;
     text-align: center;
-    margin: 70px auto;
-    user-select: none;
-`;
-
-const Logo = styled.div`   
-    position: absolute;
-    left: 50%;
-    top: 10px;
-    transform: translate(-50%, 0);
-    font-family: 'Black Han Sans', sans-serif;
-    font-size: 36px;
-    color: #fefae7;
-    text-align: left;
+    margin: 200px auto;
 `;
 
 const Content = styled.div`
     position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
+    left: 0px;
+    top: 0px;
+    width: 100%;
+    height: 100%;
 `;
 
-const InputBoxes = styled.div`
-    margin: 40px auto;
-    font-family: 'Space Mono', monospace;
+const Header = styled.div`
+    text-align: center;    
+    margin: 5px auto; 
+    color: #fefae7;
     font-size: 24px;
+    font-family: 'Space Mono', monospace;
 `;
 
-const InputBox = styled.div`  
-    width: 300px;
+const InputBoxes = styled.div`  
+    margin-top: 100px;
+    font-size: 24px;
+    font-family: 'Space Mono', 'Do Hyeon', monospace;
+`;
+
+const InputBox = styled.div`
+    position: relative;
+    width: 70%;
     margin: 20px auto;
 `;
 
@@ -51,10 +48,10 @@ const Label = styled.div`
 
 const InputField = styled.input`
     position: absolute;
-    left: 15px;
-    width: 270px;
-    color: #e83c18;
+    left: 5%;
+    width: 90%;
     font: inherit;
+    color: #e83c18;
     background-color: transparent;
     border: none; 
     :focus {
@@ -62,15 +59,16 @@ const InputField = styled.input`
     }
 `;
 
+const ButtonList = styled.div`
+    margin: 50px auto;
+`;
+
 const Button = styled.div`  
-    width: 160px;
+    width: 130px;
     height: 40px;
-    padding: 5px;
     margin: 10px auto;
-    font-family: 'Black Han Sans', sans-serif;
-    font-size: 36px;
     border: none;
-    border-radius: 30px;
+    border-radius: 50px;
     cursor: pointer;
     color: #fefae7;
     background-color: #e83c18;
@@ -78,11 +76,14 @@ const Button = styled.div`
         color: #e83c18;
         background-color: #fefae7;
     }
+    font-size: 23px;
+    font-family: 'Do Hyeon', sans-serif;
+    display: table;
 `;
 
-const StyledLink = styled(Link)`
-    color: inherit;
-    text-decoration: none;
+const Name = styled.span`
+    display: table-cell;
+    vertical-align: middle;
 `;
 
 class Authentication extends Component {
@@ -102,25 +103,25 @@ class Authentication extends Component {
 
     handleLogin = () => {
         const { username, password } = this.state;
-        if(password === "") return; // error;
+        if (password === "") return; // error;
 
         this.props.onLogin(username, password).then(
             (success) => {
-                if(!success) {
+                if (!success) {
                     this.setState({
-                        password:''
+                        password: ''
                     });
                 }
             }
         );
     }
 
-    handleRegister = () => {        
+    handleRegister = () => {
         const { username, password } = this.state;
 
         this.props.onRegister(username, password).then(
             (result) => {
-                if(!result) {
+                if (!result) {
                     this.setState({
                         username: '',
                         password: ''
@@ -131,8 +132,8 @@ class Authentication extends Component {
     }
 
     handleKeyPress = (e) => {
-        if(e.charCode === 13) {
-            if(this.props.mode) {
+        if (e.charCode === 13) {
+            if (this.props.mode) {
                 this.handleLogin();
             } else {
                 this.handleRegister();
@@ -146,46 +147,54 @@ class Authentication extends Component {
                 <InputBox>
                     <Label>Username</Label>
                     <InputField name="username" type="text" value={this.state.username}
-                        onChange={this.handleChange} autoComplete="off"/>
-                    <ReactSVG src={bubble}/>
+                        onChange={this.handleChange} autoComplete="off" />
+                    <ReactSVG src={bubble} />
                 </InputBox>
                 <InputBox>
                     <Label>Password</Label>
                     <InputField name="password" type="password" value={this.state.password}
-                        onChange={this.handleChange} onKeyPress={this.handleKeyPress}/>
-                    <ReactSVG src={bubble}/>
+                        onChange={this.handleChange} onKeyPress={this.handleKeyPress} />
+                    <ReactSVG src={bubble} />
                 </InputBox>
             </InputBoxes>
         );
 
         const signInView = (
             <Content>
-                {inputBoxes}                
-                <Button onClick={this.handleLogin}>로그인</Button>
-                <Button><StyledLink to="/signup">회원가입</StyledLink></Button>
+                <Header>Login</Header>
+                {inputBoxes}
+                <ButtonList>
+                    <Button onClick={this.handleLogin}>
+                        <Name>로그인</Name>
+                    </Button>
+                    <Link to="/signup" draggable={false}>
+                        <Button>
+                            <Name>회원가입</Name>
+                        </Button>
+                    </Link>
+                </ButtonList>
             </Content>
         );
 
         const signUpView = (
-            <Content>                    
-                {inputBoxes}                
-                <Button onClick={this.handleRegister}>회원가입</Button>
+            <Content>
+                <Header>Register</Header>
+                {inputBoxes}
+                <ButtonList>
+                    <Button onClick={this.handleRegister}>
+                        <Name>회원가입</Name>
+                    </Button>
+                </ButtonList>
             </Content>
         );
 
         return (
             <Container>
                 <ReactSVG src={background} />
-                <Logo>스토리카드.</Logo>
                 {this.props.mode ? signInView : signUpView}
             </Container>
         );
     }
 }
-
-
-
-           
-
 
 export default Authentication;

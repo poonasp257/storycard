@@ -2,14 +2,20 @@ import React from 'react';
 import styled from 'styled-components';
 
 const Content = styled.img`
-    width: 65px;
-    height: 65px;
+    width: ${props => props.mode ? `80` : `40` }px;
+    height: ${props => props.mode ? '80' : '40' }px;
+    display: inherit;
 `;
 
-function Symbol({ resource }) {
+function Symbol({ resource, mode }) {
     return (
-        <Content className="symbol" src={resource} draggable="false"/>
+        <Content className="symbol" src={resource} mode={mode ? 1 : 0} draggable="false"/>
     );
 }
 
-export default Symbol; 
+Symbol.defaultProps = {
+    resource: '',
+    mode: true
+}
+
+export default Symbol;

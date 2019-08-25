@@ -1,56 +1,56 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import { Timer, Like, TextBox } from 'components';
+import { Timer, Like, TextBox, Icon } from 'components';
 import { connect } from 'react-redux';
-import { Link } from 'react-router-dom';
- 
+
 const Container = styled.div`
-    position: relative;
     cursor: pointer;
     display: inline-block; 
-    margin: 30px;
     color: #fefae7;
 `;
 
-const Background = styled.div`
-    position: absolute;
+const Background = styled.img`
     width: ${props => props.width}px;
     height: ${props => props.height}px;
-    background-color: ${props => props.color};
 `;
 
 const Interface = styled.div`
     position: absolute;
     left: 0px;
     top: 0px;
+    width: 100%;
+    height: 100%;
 `;
 
-const StyledLink = styled(Link)`
+const Zoom = styled.div`
     position: absolute;
-    right: 30px;
-    bottom: 30px;
+    left: 312px;
+    top: 309px;
 `;
 
 class Post extends Component {
     constructor(props) {
         super(props);
 
-        this.ref = null;
-        this.originWidth = props.mode ? 180 : 60;
-        this.originHeight = props.mode ? 180 : 60;
+        this.element = null;
+        this.parentElement = null;
+        this.originWidth = props.mode ? 180 : 45;
+        this.originHeight = props.mode ? 180 : 45;
 
         this.state = {
+            info: null,
             width: this.originWidth,
             height: this.originHeight,
             isHover: false,
             isOpened: false
-        }
+        };
     }
 
     closePost = (event) => {
-        if (this.ref.contains(event.target)) return false;
+        if (this.element.contains(event.target)) return false;
 
-        this.ref.setAttribute('style', 'cursor: pointer; z-index: 0;');
+        this.parentElement.setAttribute('style', 'z-index: 0;');
+        this.element.setAttribute('style', 'cursor: pointer;');
         this.setState({
             width: this.originWidth,
             height: this.originHeight,
@@ -62,7 +62,8 @@ class Post extends Component {
     handleClick = (event) => {
         if (this.state.isOpened) return false;
 
-        this.ref.setAttribute('style', 'cursor: default; z-index: 1;');
+        this.parentElement.setAttribute('style', 'z-index: 1;');
+        this.element.setAttribute('style', 'cursor: default;');
         this.setState({
             width: this.state.width * 2.0,
             height: this.state.height * 2.0,
@@ -72,25 +73,26 @@ class Post extends Component {
     }
 
     handleMouseEnter = (event) => {
-        if (this.props.isDragging) return false;
+        if (this.props.isDragging || this.state.isOpened) return false;
 
         this.setState({ isHover: true });
     }
 
     handleMouseLeave = (event) => {
+        if (this.props.isDragging || this.state.isOpened) return false;
+
         this.setState({ isHover: false });
     }
 
     renderUI = () => {
-        const { isHover, isOpened } = this.state;
-        const { id, created, likes, text } = this.props;
-        const path = `/post/${id}`;
+        const { info, isHover, isOpened } = this.state;
+        const id = info.get('id');
         let ui = (
             <Interface>
-                <Timer created={created} mode={true}/>
-                <TextBox text={text} mode={true} postId={id}/>
-                <Like likes={likes} postId={id} mode={true}/>
-                <StyledLink to={path}>view</StyledLink>
+                <Timer created={info.get('created')} mode={true} />
+                <TextBox text={info.get('text')} writer={info.get('writer')} postId={id} mode={true} />
+                <Like likes={info.get('likes')} postId={id} mode={true} />
+                <Zoom onClick={() => window.location.href = `/main/${id}`}><Icon type="search" size="20px" /></Zoom>
             </Interface>
         );
 
@@ -98,15 +100,15 @@ class Post extends Component {
             if (isHover) {
                 ui = (
                     <Interface>
-                        <Timer created={created} mode={false}/>
-                        <Like likes={likes} postId={id} mode={false}/>
+                        <Timer created={info.get('created')} mode={false} />
+                        <Like likes={info.get('likes')} postId={id} mode={false} />
                     </Interface>
                 );
             }
             else {
                 ui = (
                     <Interface>
-                        <TextBox text={text} mode={false}/>
+                        <TextBox text={info.get('text')} postId={id} mode={false} />
                     </Interface>
                 );
             }
@@ -114,16 +116,27 @@ class Post extends Component {
 
         return ui;
     }
+    
+    static getDerivedStateFromProps(nextProps, prevState) {
+        if(!nextProps.mode) return null;
+        
+        return { info: nextProps.info };
+    }
+
+    componentDidMount() {        
+        if(!this.props.mode) return;
+        this.parentElement = document.getElementById(this.element.id).parentElement;
+    }
 
     componentWillUnmount() {
         document.removeEventListener('mousedown', this.closePost);
     }
 
     render() {
-        const { id, mode, resource } = this.props;
-        const { width, height } = this.state;        
+        const { id, resource, mode } = this.props;
+        const { width, height } = this.state;
         const background = (
-            <Background width={width} height={height} color={resource} />
+            <Background width={width} height={height} src={resource} draggable="false"/>
         );
         const deactivated = (
             <Container>
@@ -131,10 +144,10 @@ class Post extends Component {
             </Container>
         );
         const activated = (
-            <Container id={id} className="post" ref={(r) => this.ref = r} onClick={this.handleClick}
+            <Container id={id} className="post" ref={(r) => this.element = r} onClick={this.handleClick}
                 onMouseEnter={this.handleMouseEnter} onMouseLeave={this.handleMouseLeave}>
                 {background}
-                {this.renderUI()}
+                {mode ? this.renderUI() : null}
             </Container>
         );
 
@@ -142,9 +155,22 @@ class Post extends Component {
     }
 }
 
-const mapStateToProps = (state) => {
+Post.defaultProps = {
+    id: '',
+    resource: '#fefae7',
+    mode: true
+};
+
+const mapStateToProps = (state, ownProps) => {
+    if (ownProps.mode === false) return { isDragging: state.drag.get('isDragging') };
+
+    const item = state.post.get('items').find(item => {
+        return item.getIn(['info', 'id']) === ownProps.id;
+    });
+
     return {
-        isDragging: state.drag.get('isDragging')
+        isDragging: state.drag.get('isDragging'),
+        info: item.get('info')
     };
 };
 

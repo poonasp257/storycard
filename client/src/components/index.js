@@ -1,5 +1,5 @@
 import Authentication from './Authentication';
-import Menu from './Menu';
+import Toolkit from './Toolkit';
 import Board from './Board';
 import Symbol from './Symbol';
 import Post from './Post';
@@ -8,10 +8,11 @@ import Draggable from './Draggable';
 import Like from './Like';
 import Timer from './Timer';
 import TextBox from './TextBox';
+import Icon from './Icon';
 
 export {
     Authentication,
-    Menu,
+    Toolkit,
     Board,
     Symbol,
     Post,
@@ -19,5 +20,6 @@ export {
     Draggable,
     Like,
     Timer,
-    TextBox
+    TextBox,
+    Icon
 };

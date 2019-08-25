@@ -1,41 +1,59 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import LinesEllipsis from 'react-lines-ellipsis';
 import { connect } from  'react-redux';
 import { editPostRequest, deletePostRequest } from 'modules/post'; 
+import Icon from './Icon';
 
 const Container = styled.div`
-    margin: 15px;
+    position: relative;
+    top: ${props => props.mode ? '35' : '0'}px;
+    left: ${props => props.mode ? '30' : '0'}px;
+    margin: 10px auto;
     font-family: 'Space Mono', 'Jua', sans-serif;
-    font-size: 20px;
+    font-size: 21px;
+    line-height: 28px;
 `;
 
 const Text = styled.textarea`
-    width: 330px;
+    width: 280px;
     height: 280px;
-    resize: none;
-    text-decoration: none;
-    cursor: ${props => props.cursor};
     border: none;
-    font: inherit;
     color: inherit;
+    font: inherit;
+    text-decoration: none;
+    resize: none;
+    overflow: hidden;
     background-color: transparent;
-    max-length: 195;
+    cursor: ${props => props.cursor};
     :focus {
         outline: none;
     }
 `;
 
 const ButtonList = styled.div`
-    postion: absolute;
-    right: 0px;
-    top: 0px;
+    position: absolute;
+    left: 230px;
+    top: 264px;
     cursor: pointer;
 `; 
+
+const Ellipsis = styled.div` 
+    display: -webkit-box;
+    max-width: 160px;
+    height: ${20 * 3 * 1.4}px;
+    margin: 0 auto;
+    -webkit-line-clamp: 5;
+    -webkit-box-orient: vertical;
+    text-overflow: ellipsis;
+`;
 
 class TextBox extends Component {
     constructor(props) {
         super(props);
+        
+        const lineToShow = 21;
+        const lines = 9;
+        this.maxLen = lineToShow * lines;
 
         this.state = {
             description: props.text,
@@ -44,27 +62,38 @@ class TextBox extends Component {
     };
 
     handleChange = (event) => {
-        this.setState({
-            description: event.target.value
-        });
+        let currentLen = 0; 
+        let str = event.target.value; 
+
+        for(let i = 0; i < str.length; ++i) {
+            const ch = str.charCodeAt(i);
+
+            if(ch === 10) currentLen += 21;
+            else if(ch === 32) currentLen += 1.05;
+            else currentLen += (ch > 127) ? 1.3125 : 1;
+
+            if(this.maxLen + 1 <= currentLen) {
+                str = str.substring(0, i);
+                break;
+            }
+        }  
+
+        event.target.value = str;
+        this.setState({ description: str });
     }
     
     handleEdit = () => {
         const { isEditMode, description } = this.state; 
-        
-        if(isEditMode) {
-            if(window.confirm('Are you sure?')) {
-                this.props.editPostRequest(this.props.postId, description).then(
-                    () => {
 
-                    }
-                );
-            }
+        if (isEditMode && window.confirm('Are you sure?')) {
+            this.props.editPostRequest(this.props.postId, description).then(
+                () => {
+
+                }
+            );
         }
 
-        this.setState({
-            isEditMode: !this.state.isEditMode
-        });
+        this.setState({ isEditMode: !isEditMode });
     }
 
     handleDelete = () => {
@@ -83,34 +112,38 @@ class TextBox extends Component {
     }
 
     render() {
-        const { mode } = this.props;
         const { description, isEditMode } = this.state;
-        const editIcon = isEditMode ? 'submit' : 'edit';
-        const editMode = isEditMode ? 
+        const { mode, writer, username } = this.props;
+        const textbox = isEditMode ? 
             <Text defaultValue={description} onChange={this.handleChange}/>
             : <Text defaultValue={description} readOnly cursor="inherit"/>;
-            
-        const viewMode = mode ?
-            <div>
-                {editMode}
+        const buttons = (writer === username) ? (
                 <ButtonList>
-                    <div onClick={this.handleEdit}>{editIcon}</div> 
-                    <div onClick={this.handleDelete}>delete</div>
+                    <Icon type={isEditMode ? 'check' : 'edit'} onClick={this.handleEdit}/> 
+                    <Icon type="delete_forever" onClick={this.handleDelete}/>
                 </ButtonList>
-            </div>
-            : <LinesEllipsis text={description} 
-                ellipsis='...' basedOn='letters'/>;
-
-        return (
-            <Container>
-                {viewMode}
+            ) : null;         
+        const activated = (
+            <Container mode>
+                {textbox}
+                {buttons}
             </Container>
         );
+        const deactivated = (
+            <Container>
+                <Ellipsis>
+                    {description}
+                </Ellipsis>
+            </Container>
+        );
+
+        return mode ? activated : deactivated;
     };
 };
 
 const mapStateToProps = (state) => {
     return {
+        username: state.authentication.getIn(['status', 'currentUser']),
         status: {
             edit: state.post.get(['edit', 'status']),
             delete: state.post.get(['delete', 'status'])

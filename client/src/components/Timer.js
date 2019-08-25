@@ -7,19 +7,11 @@ const SEC =  MSEC * 60;
 const MINUTE = SEC * 60;
 const HOUR = MINUTE * 24;
 
-const opened = `
-    left: 20px; 
-    top: 280px;
-`;
-
-const notOpened = `
-    left: 40px;
-    top: 50px;
-`;
-
 const Container = styled.div`
     position: absolute;
-    ${props => props.mode ? opened : notOpened}
+    ${props => props.mode ? 
+        'left: 180px; top: 0px; transform: translate(-50%, 0); margin: 10px;' 
+        : 'left: 40px; top: 50px;'}
     font-family: 'Space Mono', monospace;
     font-size: 20px;
     font-weight: bold;
@@ -27,12 +19,10 @@ const Container = styled.div`
 
 class Timer extends Component {    
     constructor(props) {
-        super(props);
-
-        this.timerID = null;
-
+        super(props); 
+        
         const remainTime = HOUR - (Date.now() - Date.parse(props.created));
-
+        this.timerID = null;
         this.state = {
             remainTime: remainTime,
             hour: Math.floor((remainTime % HOUR) / MINUTE),
@@ -66,7 +56,7 @@ class Timer extends Component {
 
     render() {
         const { hour, minute, second } = this.state;
-
+        
         return (
             <Container mode={this.props.mode}>
                 {Pad(hour, 2)}:{Pad(minute, 2)}:{Pad(second, 2)}

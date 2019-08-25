@@ -19,7 +19,7 @@ class SignIn extends Component {
                     document.cookie = 'key=' + btoa(JSON.stringify(loginData));
 
                     Materialize.toast({ html: `Welcome, ${id}!` });
-                    this.props.history.push('/');
+                    this.props.history.push('/main');
                     return true;
                 } else {
                     let $toastContent = $('<span style="color: #FFB4BA">Incorrect username or password</span>');
