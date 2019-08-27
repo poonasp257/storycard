@@ -58,7 +58,6 @@ class Main extends Component {
         return new Promise((resolve, reject) => {
             let loginData = getCookie('key');
             if (typeof loginData === "undefined") {
-                console.log('login data undefined')
                 window.location.href = "/signin";
                 reject(false);
             }

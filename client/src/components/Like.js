@@ -61,12 +61,16 @@ class Like extends Component {
     }
 
     static getDerivedStateFromProps(nextProps, prevState) {
-        //console.log(nextProps.postId, nextProps.likes);
+        //console.log('Like component get new props...', nextProps.likes);
+
         return { likes: nextProps.likes };
     }
 
     shouldComponentUpdate(nextProps, nextState) {
-        return JSON.stringify(nextProps) != JSON.stringify(this.props);
+        const isUpdated = (JSON.stringify(nextProps) != JSON.stringify(this.props))
+            || (JSON.stringify(nextState) != JSON.stringify(this.state));
+
+        return isUpdated;
     }
 
     render() {

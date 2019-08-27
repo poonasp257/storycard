@@ -102,7 +102,7 @@ export function getItemsRequest({ tag, postId }) {
         dispatch(getItems()); 
  
         return axios.post(`/api/post/getItems/${tag}`, { postId })
-            .then((response) => {                
+            .then((response) => {          
                 const items = response.data.map((info) => {
                     return CreateItem(info);
                 });

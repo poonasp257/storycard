@@ -32,6 +32,7 @@ class Post extends Component {
     constructor(props) {
         super(props);
 
+        this.ref = React.createRef();
         this.element = null;
         this.parentElement = null;
         this.originWidth = props.mode ? 180 : 45;
@@ -85,6 +86,8 @@ class Post extends Component {
     }
 
     renderUI = () => {
+        //console.log('and render UI');
+
         const { info, isHover, isOpened } = this.state;
         const id = info.get('id');
         let ui = (
@@ -119,13 +122,17 @@ class Post extends Component {
     
     static getDerivedStateFromProps(nextProps, prevState) {
         if(!nextProps.mode) return null;
+
+        //console.log('post comp, get new props...', nextProps.info);
         
         return { info: nextProps.info };
     }
 
     componentDidMount() {        
         if(!this.props.mode) return;
-        this.parentElement = document.getElementById(this.element.id).parentElement;
+
+        this.element = this.ref.current;
+        this.parentElement = this.element.parentElement;
     }
 
     componentWillUnmount() {
@@ -144,7 +151,7 @@ class Post extends Component {
             </Container>
         );
         const activated = (
-            <Container id={id} className="post" ref={(r) => this.element = r} onClick={this.handleClick}
+            <Container id={id} className="post" ref={this.ref} onClick={this.handleClick}
                 onMouseEnter={this.handleMouseEnter} onMouseLeave={this.handleMouseLeave}>
                 {background}
                 {mode ? this.renderUI() : null}

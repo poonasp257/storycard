@@ -63,7 +63,7 @@ router.post('/delete', (req, res) => {
     const { postId } = req.body;
     const username = req.session.loginInfo.username;
     const index = postList.findIndex((post) => {
-        return post.id === postId
+        return post._id.toString() === postId.toString()
             && post.writer === username;
     });
     if (index < 0) return res.json({ success: false });
@@ -81,7 +81,7 @@ router.post('/edit', (req, res) => {
     const { postId, text } = req.body;
     const username = req.session.loginInfo.username;
     const index = postList.findIndex((post) => {
-        return post.id === postId
+        return post._id.toString() === postId.toString()
             && post.writer === username;
     });
     if (index < 0) return res.json({ success: false });
@@ -99,10 +99,11 @@ router.post('/like', (req, res) => {
     const { postId, index } = req.body;
     const username = req.session.loginInfo.username;
     const postIndex = postList.findIndex(post => { 
-        return post.id === postId;
+        return post._id.toString() === postId.toString();
     });
     if (postIndex < 0) return res.json({ success: false });
     
+
     if(index < 0) { 
         postList[postIndex].likes.push(username);
         Post.updateOne({ _id: postId }, { $push: { likes: username } }, (err) => {
