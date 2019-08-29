@@ -1,11 +1,11 @@
 import { combineReducers } from 'redux';
     
 import authentication from './authentication';
-import post from './post';
+import item from './item';
 import drag from './drag';
 
 export default combineReducers({
     authentication,
-    post,
+    item,
     drag
 });

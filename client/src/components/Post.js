@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import styled from 'styled-components';
 import { Timer, Like, TextBox, Icon } from 'components';
 import { connect } from 'react-redux';
+import { deletePostRequest } from 'modules/item'; 
 
 const Container = styled.div`
     cursor: pointer;
@@ -22,27 +23,29 @@ const Interface = styled.div`
     height: 100%;
 `;
 
-const Zoom = styled.div`
+const Button = styled.div`
     position: absolute;
-    left: 312px;
-    top: 309px;
+    right: 0px;
+    top: 0px;
+    margin: 10px;
+    margin-right: 25px;
 `;
 
 class Post extends Component {
     constructor(props) {
         super(props);
 
+        const { mode, size } = props;
+        
         this.ref = React.createRef();
         this.element = null;
         this.parentElement = null;
-        this.originWidth = props.mode ? 180 : 45;
-        this.originHeight = props.mode ? 180 : 45;
-
+        this.originWidth = mode ? size * 2 : size;
+        this.originHeight = mode ? size * 2 : size;
         this.state = {
             info: null,
             width: this.originWidth,
             height: this.originHeight,
-            isHover: false,
             isOpened: false
         };
     }
@@ -66,55 +69,51 @@ class Post extends Component {
         this.parentElement.setAttribute('style', 'z-index: 1;');
         this.element.setAttribute('style', 'cursor: default;');
         this.setState({
-            width: this.state.width * 2.0,
-            height: this.state.height * 2.0,
+            width: this.state.width * 4.0,
+            height: this.state.height * 4.0,
             isOpened: true
         });
         document.addEventListener('mousedown', this.closePost);
     }
 
-    handleMouseEnter = (event) => {
-        if (this.props.isDragging || this.state.isOpened) return false;
+    handleDelete = () => {
+        if(!window.confirm('delete this?')) return false; 
+        this.props.deletePostRequest(this.state.info.get('id')).then(
+            () => {
+                if(this.props.status === 'SUCCESS') {
 
-        this.setState({ isHover: true });
-    }
+                }
+                else {
 
-    handleMouseLeave = (event) => {
-        if (this.props.isDragging || this.state.isOpened) return false;
-
-        this.setState({ isHover: false });
+                }
+            }
+        )
     }
 
     renderUI = () => {
-        //console.log('and render UI');
-
-        const { info, isHover, isOpened } = this.state;
+        const { info, isOpened } = this.state;
         const id = info.get('id');
+        const isWriter = this.props.username === info.get('writer');
         let ui = (
             <Interface>
                 <Timer created={info.get('created')} mode={true} />
-                <TextBox text={info.get('text')} writer={info.get('writer')} postId={id} mode={true} />
-                <Like likes={info.get('likes')} postId={id} mode={true} />
-                <Zoom onClick={() => window.location.href = `/main/${id}`}><Icon type="search" size="20px" /></Zoom>
+                { isWriter ? (
+                    <Button onClick={this.handleDelete}>
+                        <Icon type="delete_forever" size="24px"/>
+                    </Button>
+                ) : null }
+                <TextBox text={info.get('text')} writer={info.get('writer')} postId={id}/>
+                <Like likes={info.get('likes')} postId={id} mode={true}/>
             </Interface>
         );
 
         if (!isOpened) {
-            if (isHover) {
-                ui = (
-                    <Interface>
-                        <Timer created={info.get('created')} mode={false} />
-                        <Like likes={info.get('likes')} postId={id} mode={false} />
-                    </Interface>
-                );
-            }
-            else {
-                ui = (
-                    <Interface>
-                        <TextBox text={info.get('text')} postId={id} mode={false} />
-                    </Interface>
-                );
-            }
+            ui = (
+                <Interface>
+                    <Timer created={info.get('created')} mode={false} />
+                    <Like likes={info.get('likes')} postId={id} mode={false} />
+                </Interface>
+            );
         }
 
         return ui;
@@ -123,8 +122,6 @@ class Post extends Component {
     static getDerivedStateFromProps(nextProps, prevState) {
         if(!nextProps.mode) return null;
 
-        //console.log('post comp, get new props...', nextProps.info);
-        
         return { info: nextProps.info };
     }
 
@@ -151,8 +148,7 @@ class Post extends Component {
             </Container>
         );
         const activated = (
-            <Container id={id} className="post" ref={this.ref} onClick={this.handleClick}
-                onMouseEnter={this.handleMouseEnter} onMouseLeave={this.handleMouseLeave}>
+            <Container id={id} className="post" ref={this.ref} onClick={this.handleClick}>
                 {background}
                 {mode ? this.renderUI() : null}
             </Container>
@@ -165,20 +161,39 @@ class Post extends Component {
 Post.defaultProps = {
     id: '',
     resource: '#fefae7',
+    size: 45,
     mode: true
 };
 
 const mapStateToProps = (state, ownProps) => {
-    if (ownProps.mode === false) return { isDragging: state.drag.get('isDragging') };
+    if (ownProps.mode === false) return { 
+        isDragging: false,
+        username: '',
+        status: {
+            edit: ''
+        }
+    };
 
-    const item = state.post.get('items').find(item => {
+    const item = state.item.getIn(['items', 'posts']).find(item => {
         return item.getIn(['info', 'id']) === ownProps.id;
     });
 
-    return {
-        isDragging: state.drag.get('isDragging'),
-        info: item.get('info')
+    return {    
+        isDragging: state.drag.get('isDragging'),    
+        username: state.authentication.getIn(['status', 'currentUser']),
+        info: item.get('info'),
+        status: {
+            edit: state.item.get(['edit', 'status'])
+        },
     };
 };
 
-export default connect(mapStateToProps, null)(Post);
+const mapDispatchToProps = (dispatch) => {
+    return {
+        deletePostRequest: (postId) => {
+            return dispatch(deletePostRequest(postId));
+        }
+    }
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Post);

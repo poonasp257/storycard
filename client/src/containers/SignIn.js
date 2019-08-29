@@ -1,9 +1,16 @@
 import React, { Component } from 'react';
+import styled from 'styled-components';
 import { connect } from 'react-redux';
 import $ from 'jquery';
 import Materialize from 'materialize-css';
-import { Authentication } from 'components'
+import { Authentication, BackButton } from 'components'
 import { loginRequest } from 'modules/authentication';
+
+const Button = styled.div`
+    position: absolute;
+    left: 10%;
+    top: 7%;
+`; 
 
 class SignIn extends Component {
     handleLogin = (id, pw) => {
@@ -33,6 +40,7 @@ class SignIn extends Component {
     render() {
         return (
             <div>
+                <Button><BackButton to="/" size="30px"/></Button>
                 <Authentication mode={true} onLogin={this.handleLogin} />
             </div>
         );

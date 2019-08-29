@@ -1,12 +1,12 @@
-import React, { Component } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 
 import ReactSVG from 'react-svg';
-import title from 'resources/SVG/title.svg';
-import start from 'resources/PNG/title-start.png';
-import tutorial from 'resources/PNG/title-tutorial.png';
-import credit from 'resources/PNG/title-credit.png';
+import title from 'resources/title/SVG/title.svg';
+import start from 'resources/title/PNG/start.png';
+import tutorial from 'resources/title/PNG/tutorial.png';
+import credit from 'resources/title/PNG/credit.png';
 
 const Container = styled.div`
     text-align: center;
@@ -14,7 +14,7 @@ const Container = styled.div`
 `;
 
 const Header = styled(ReactSVG)`
-    width: 300px;
+    width: 325px;
     margin: 0 auto;
 `;
 
@@ -43,29 +43,23 @@ const Name = styled(Link)`
     vertical-align: middle;
 `;
 
-class Title extends Component {
-    constructor(props) {
-        super(props);
-    };
-
-    render() {
-        return (
-            <Container>
-                <Header src={title}/>
-                <ButtonList>
-                    <Button src={start} width={388} height={173}>
-                        <Name to="/signin" draggable="false">Start</Name>
-                    </Button>
-                    <Button src={tutorial} width={394} height={140}>
-                        <Name to="/tutorial" draggable="false">Tutorial</Name>
-                    </Button>
-                    <Button src={credit} width={393} height={166}>
-                        <Name to="/credit"draggable="false">Credit</Name>
-                    </Button>
-                </ButtonList>
-            </Container>
-        );
-    };
+function Title() {
+    return (
+        <Container>
+            <Header src={title} />
+            <ButtonList>
+                <Button src={start} width={388} height={168}>
+                    <Name to="/main" draggable="false">Start</Name>
+                </Button>
+                <Button src={tutorial} width={394} height={140}>
+                    <Name to="/tutorial" draggable="false">Tutorial</Name>
+                </Button>
+                <Button src={credit} width={393} height={166}>
+                    <Name to="/credit" draggable="false">Credit</Name>
+                </Button>
+            </ButtonList>
+        </Container>
+    );
 };
 
 export default Title;

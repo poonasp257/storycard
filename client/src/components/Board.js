@@ -2,11 +2,11 @@ import React, { Component } from 'react';
 import styled from 'styled-components';
 import { connect } from 'react-redux';
 
-import background from 'resources/PNG/board-paper.png';
+import background from 'resources/main/PNG/board-paper.png';
 
 const OutContainer = styled.div`
-    width: ${window.innerWidth}px;
-    height: ${window.innerHeight}px;
+    width: ${window.screen.width}px;
+    height: ${window.screen.height}px;
     overflow-x: scroll;
     overflow-y: hidden;
     ::-webkit-scrollbar { display: none; }
@@ -15,16 +15,16 @@ const OutContainer = styled.div`
 const InContainer = styled.div`
     position: relative;
     width: ${props => props.width}px;
-    height: ${window.innerHeight}px;
+    height: ${window.screen.height}px;
     background: url(${background}) repeat-x;
-    background-size: contain;
+    background-size: 50%;
 `;
 
 const DropZone = styled.div`
     position: absolute;
     top: 40%;
     width: ${props => props.width}px;
-    height: ${window.innerHeight * 0.75}px;
+    height: ${window.screen.height * 0.75}px;
     transform: translate(0, -40%);
 `;
 
@@ -32,10 +32,11 @@ class Board extends Component {
     constructor(props) {
         super(props);
 
-        this.ref = null;
+        this.ref = null; 
         this.state = {
             scrollLeft: 0,
-            width: window.innerWidth * 2,
+            width: window.screen.width * 2,
+            height: window.screen.height,
             items: null,
             contents: null
         };
@@ -55,34 +56,33 @@ class Board extends Component {
             width: boardWidth,
             scrollLeft: this.ref.scrollLeft 
         });
-    }
+    } 
 
     static getDerivedStateFromProps(nextProps, prevState) {
         const items = nextProps.items;
-        let contents = [];
-
-        items.map(item => {
+        const contents = items.map(item => {
             const itemLeft = parseInt(item.getIn(['info', 'left']), 10);
             
-            if (prevState.scrollLeft - window.innerWidth < itemLeft
-                && itemLeft < prevState.scrollLeft + window.innerWidth) {
-                contents.push(item.get('content'));
-            }
+            if (prevState.scrollLeft - window.screen.width < itemLeft
+                && itemLeft < prevState.scrollLeft + window.screen.height) return item.get('content');
+            else return null;
         });
 
         return { items: items, contents: contents };
     }
 
     shouldComponentUpdate(nextProps, nextState) {
-        return JSON.stringify(nextState) != JSON.stringify(this.state);
-    }
+        return JSON.stringify(nextState) !== JSON.stringify(this.state);
+    } 
 
     render() {
+        const { width, height, contents } = this.state;
+
         return (
             <OutContainer ref={r => this.ref = r} onWheel={this.handleWheel}>
-                <InContainer width={this.state.width}>
-                    <DropZone className="board" width={this.state.width}>
-                        {this.state.contents}
+                <InContainer width={width}>
+                    <DropZone className="board" width={width}>
+                        {contents}
                     </DropZone>
                 </InContainer>
             </OutContainer>
@@ -91,8 +91,10 @@ class Board extends Component {
 }
 
 const mapStateToProps = (state) => {
+    const items = state.item.get('items');
+
     return {
-        items: state.post.get('items')
+        items: items.get('posts').concat(items.get('symbols'))
     };
 };
 

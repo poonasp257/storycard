@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import PropTypes from 'prop-types';
 import ResourceLoader from 'lib/ResourceLoader';
 import { Draggable } from 'components';
 
@@ -25,15 +26,15 @@ const Category = styled.span`
 
 const List = styled.div`
     position: absolute;
-    left: 0px;
-    top: 30px;
+    left: ${props => props.tag === 'symbol' ? 15 : 0}px;
+    top: ${props => props.tag === 'symbol' ? 30 : 33}px;
     width: 350px;
     margin: 10px;
 `;
 
 const ItemContainer = styled.div`
     float: left;
-    margin: 10px;
+    margin: ${props => props.spacing}px;
 `;
 
 const LAGNGUAGE = {
@@ -42,15 +43,15 @@ const LAGNGUAGE = {
     'post': '직접입력'
 };
 
-function ItemList({ bg, category, Item, tag, targetTag }) {
+function ItemList({ bg, category, Item, tag, targetTag, size, itemSpacing }) {
     let items = [];
     const resources = ResourceLoader(category);
 
     for(let i = 0; i < resources.length; ++i) {
         items.push(
-            <ItemContainer key={items.length}>
+            <ItemContainer key={items.length} spacing={itemSpacing}>
                 <Draggable category={category} type={i} tag={tag} targetTag={targetTag}>
-                    <Item resource={resources[i]} mode={false}/>
+                    <Item resource={resources[i]} size={size} mode={false}/>
                 </Draggable>
             </ItemContainer>
         );
@@ -61,9 +62,18 @@ function ItemList({ bg, category, Item, tag, targetTag }) {
         <Container>
             <Background src={bg}/>
             <Category>{translatedCategory}</Category>
-            <List>{items}</List>
+            <List tag={tag}>{items}</List>
         </Container>
     );
+};
+
+ItemList.propTypes = {
+    bg: PropTypes.string.isRequired,
+    category: PropTypes.string.isRequired,
+    tag: PropTypes.string.isRequired,
+    targetTag: PropTypes.string.isRequired,
+    size: PropTypes.number.isRequired,
+    itemSpacing: PropTypes.number.isRequired,
 };
 
 export default ItemList;

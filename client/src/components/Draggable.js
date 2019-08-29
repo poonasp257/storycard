@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import * as Utility from 'lib/Utility';
 
 import { connect } from  'react-redux';
-import { attachItemRequest  } from 'modules/post'; 
+import { attachItemRequest  } from 'modules/item'; 
 import { dragStart, dragEnd } from 'modules/drag';
 
 const Container = styled.div`
@@ -90,18 +90,17 @@ class Draggable extends Component {
 
         for(let targetCollider of targetColliders) {
             if (!Utility.IsContaining(targetCollider, collider)) continue;
-        
-            for(let target of filteredTargets) {
-                const items = target.getElementsByClassName('item');
-                const itemColliders = Utility.GetRects(items);
-                for (let itemCollider of itemColliders) {
-                    if (Utility.IsOverlap(itemCollider, collider)) return false;
-                }
+            
+            // for(let target of filteredTargets) {
+            //     const items = target.getElementsByClassName('item');
+            //     const itemColliders = Utility.GetRects(items);
+            //     for (let itemCollider of itemColliders) {
+            //         if (Utility.IsOverlap(itemCollider, collider)) return false;
+            //     }
         
                 if (window.confirm('Are you sure, you want to drop this?')) {
                     const { category, type, tag } = this.props;
-                    const postId = window.location.pathname.split('/').pop();
-                    const size = ((tag === 'post') ? collider.width : collider.width / 4) * 1.3; 
+                    const size = ((tag === 'post') ? collider.width / 2 : collider.width / 2.5); 
                     const left = parseInt(this.dragElem.style['left'], 10) 
                         - targetCollider.left - size;
                     const top = parseInt(this.dragElem.style['top'], 10) 
@@ -109,7 +108,6 @@ class Draggable extends Component {
                     const info = {
                         category,
                         type,
-                        postId,
                         left: `${left}px`,
                         top: `${top}px`
                     };
@@ -122,7 +120,7 @@ class Draggable extends Component {
                         }
                     );    
                 }
-            }
+            // }
         }
     }
 
@@ -143,7 +141,7 @@ Draggable.propTypes = {
 
 const mapStateToProps = (state) => {
     return {
-        status: state.post.getIn(['attach', 'status'])
+        status: state.item.getIn(['attach', 'status'])
     }
 }
 

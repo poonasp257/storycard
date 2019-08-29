@@ -9,7 +9,6 @@ const Post = new Schema({
     top: String,  
     likes: Array,
     text: String,
-    symbols: Array,
     writer: String,
     created: { type: Date, default: Date.now }
 });

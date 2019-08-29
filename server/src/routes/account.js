@@ -39,6 +39,12 @@ router.post('/signup', (req, res) => {
 
         account.save(err => {
             if(err) throw err;
+
+            req.session.loginInfo = {
+                _id: account._id,
+                username: account.username
+            };
+
             return res.json({ success: true });
         });
     });
@@ -70,8 +76,7 @@ router.post('/signin', (req, res) => {
             });
         }
 
-        let session = req.session;
-        session.loginInfo = {
+        req.session.loginInfo = {
             _id: account._id,
             username: account.username
         };

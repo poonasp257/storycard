@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
+import Materialize from 'materialize-css';
 
 import ReactSVG from 'react-svg';
-import background from 'resources/SVG/loginBackground.svg';
-import bubble from 'resources/SVG/loginBubble.svg';
+import background from 'resources/login/SVG/loginBackground.svg';
+import bubble from 'resources/login/SVG/loginBubble.svg';
 
 const Container = styled.div`
     position: relative;
@@ -103,7 +104,10 @@ class Authentication extends Component {
 
     handleLogin = () => {
         const { username, password } = this.state;
-        if (password === "") return; // error;
+        if (password === "") { 
+            Materialize.toast({ html: `The password field is empty` });
+            return;
+        }
 
         this.props.onLogin(username, password).then(
             (success) => {

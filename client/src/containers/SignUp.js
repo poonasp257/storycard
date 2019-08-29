@@ -1,17 +1,31 @@
 import React, { Component } from 'react';
+import styled from 'styled-components';
 import { connect } from 'react-redux';
 import $ from 'jquery';
 import Materialize from 'materialize-css';
-import { Authentication } from 'components';
+import { Authentication, BackButton } from 'components';
 import { registerRequest } from 'modules/authentication';
+
+const Button = styled.div`
+    position: absolute;
+    left: 10%;
+    top: 7%;
+`; 
 
 class SignUp extends Component {
     handleRegister = (id, pw) => {
         return this.props.registerRequest(id, pw).then(
             () => {
                 if (this.props.status === "SUCCESS") {
-                    Materialize.toast({ html: 'Success! Please log in.' });
-                    this.props.history.push('/signin');
+                    let loginData = {
+                        isLoggedIn: true,
+                        username: id
+                    };
+
+                    document.cookie = 'key=' + btoa(JSON.stringify(loginData));
+
+                    Materialize.toast({ html: `Welcome, ${id}!` });
+                    this.props.history.push('/main');
                     return true;
                 } else {
                     /*
@@ -37,6 +51,7 @@ class SignUp extends Component {
     render() {
         return (
             <div>
+                <Button><BackButton to="/signin" size="30px"/></Button>
                 <Authentication mode={false} onRegister={this.handleRegister} />
             </div>
         );

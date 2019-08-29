@@ -7,29 +7,30 @@ import styled from 'styled-components';
 import ResourceLoader from 'lib/ResourceLoader'; 
 import { Post, Symbol } from 'components';
  
-const ATTACH_ITEM = "post/ATTACH_ITEM";
-const ATTACH_ITEM_SUCCESS = "post/ATTACH_ITEM_SUCCESS";
-const ATTACH_ITEM_FAILURE = "post/ATTACH_ITEM_FAILURE";
+const ATTACH_ITEM = "item/ATTACH_ITEM";
+const ATTACH_ITEM_SUCCESS = "item/ATTACH_ITEM_SUCCESS";
+const ATTACH_ITEM_FAILURE = "item/ATTACH_ITEM_FAILURE";
 
-const DELETE_ITEM = "post/DELETE_ITEM";
-const DELETE_ITEM_SUCCESS = "post/DELETE_ITEM_SUCCESS";
-const DELETE_ITEM_FAILURE = "post/DELETE_ITEM_FAILURE";
+const DELETE_ITEM = "item/DELETE_ITEM";
+const DELETE_ITEM_SUCCESS = "item/DELETE_ITEM_SUCCESS";
+const DELETE_ITEM_FAILURE = "item/DELETE_ITEM_FAILURE";
 
-const LIKE = "post/INC_LIKE";
-const LIKE_SUCCESS = "post/INC_LIKE_SUCCESS";
-const LIKE_FAILURE = "post/INC_LIKE_FAILURE";
+const LIKE = "item/INC_LIKE";
+const LIKE_SUCCESS = "item/INC_LIKE_SUCCESS";
+const LIKE_FAILURE = "item/INC_LIKE_FAILURE";
 
-const EDIT_POST = "post/EDIT_POST";
-const EDIT_POST_SUCCESS = "post/EDIT_POST_SUCCESS";
-const EDIT_POST_FAILURE = "post/EDIT_POST_FAILURE";
+const EDIT_POST = "item/EDIT_POST";
+const EDIT_POST_SUCCESS = "item/EDIT_POST_SUCCESS";
+const EDIT_POST_FAILURE = "item/EDIT_POST_FAILURE";
 
-const GET_ITEMS = "post/GET_ITEMS";
-const GET_ITEMS_SUCCESS = "post/GET_ITEMS_SUCCESS";
-const GET_ITEMS_FAILURE = "post/GET_ITEMS_FAILURE";
+const GET_ITEMS = "item/GET_ITEMS";
+const GET_ITEMS_SUCCESS = "item/GET_ITEMS_SUCCESS";
+const GET_ITEMS_FAILURE = "item/GET_ITEMS_FAILURE";
 
-const LISTEN_GET_ITEM = "post/LISTEN_GET_ITEM";
-const LISTEN_DELETE_ITEM = "post/LISTEN_DELETE_ITEM";
-const LISTEN_UPDATE_ITEM = "post/LISTEN_EDIT_POST"; 
+const LISTEN_GET_POST = "item/LISTEN_GET_POST";
+const LISTEN_GET_SYMBOL = "item/LISTEN_GET_SYMBOL";
+const LISTEN_DELETE_POST = "item/LISTEN_DELETE_POST";
+const LISTEN_UPDATE_POST = "item/LISTEN_UPDATE_POST"; 
 
 function CreateItem(info) {
     const { _id, category, type, left, top, ...props } = info;
@@ -62,7 +63,7 @@ export function attachItemRequest(tag, info) {
     return (dispatch) => {
         dispatch(attachItem());
 
-        return axios.post(`/api/post/attach/${tag}`, info)
+        return axios.post(`/api/item/attach/${tag}`, info)
             .then((response) => {
                 dispatch(attachItemSuccess());
             }).catch((error) => {
@@ -75,7 +76,7 @@ export function deletePostRequest(postId) {
     return (dispatch) => {
         dispatch(deletePost());
 
-        return axios.post('/api/post/delete', { postId })
+        return axios.post('/api/item/delete', { postId })
             .then((response) => {
                 dispatch(deletePostSuccess());
             }).catch((error) => {
@@ -88,27 +89,31 @@ export function editPostRequest(postId, text) {
     return (dispatch) => {
         dispatch(editPost());
 
-        return axios.post('/api/post/edit', { postId, text })
+        return axios.post('/api/item/edit', { postId, text })
             .then((response) => {
-                dispatch(deletePostSuccess());
+                dispatch(editPostSuccess());
             }).catch((error) => {
-                dispatch(deletePostFailure(error.response.data.code));
+                dispatch(editPostFailure(error.response.data.code));
             });
     }
 }
 
-export function getItemsRequest({ tag, postId }) {    
+export function getItemsRequest() {    
     return (dispatch) => {
         dispatch(getItems()); 
  
-        return axios.post(`/api/post/getItems/${tag}`, { postId })
-            .then((response) => {          
-                const items = response.data.map((info) => {
-                    return CreateItem(info);
-                });
+        return axios.post('/api/item/getItems')
+            .then((response) => {     
+                let items = {};
+
+                for(let key in response.data) {
+                    items[key] = response.data[key].map(info => {
+                        return CreateItem(info);
+                    });
+                }
                 
                 dispatch(getItemsSuccess(items));
-            }).catch((error) => {
+            }).catch((error) => {                
                 dispatch(getItemsFailure(error.response.data.code));
             });
     }
@@ -118,7 +123,7 @@ export function LikeRequest(postId, index) {
     return (dispatch) => {
         dispatch(Like());
 
-        return axios.post('/api/post/like', { postId, index })
+        return axios.post('/api/item/like', { postId, index })
         .then(() => {
             dispatch(LikeSuccess());
         }).catch((error) => {
@@ -129,18 +134,23 @@ export function LikeRequest(postId, index) {
 
 export function updateItems(socket) {
     return (dispatch) => {
-        socket.on('attach', (data) => {
-            const item = CreateItem(data);
-            dispatch({ type: LISTEN_GET_ITEM, payload: item });
+        socket.on('attach/post', (data) => {
+            dispatch({ type: LISTEN_GET_POST, payload: data });
+        });
+
+        socket.on('attach/symbol', (data) => {
+            dispatch({ type: LISTEN_GET_SYMBOL, payload: data });
         });
         
         socket.on('delete', (index) => {
-            dispatch({ type: LISTEN_DELETE_ITEM, payload: index });
+            dispatch({ type: LISTEN_DELETE_POST, payload: index });
         });
 
         socket.on('update', (data) => {
             const { index, info } = data;
-            dispatch({ type: LISTEN_UPDATE_ITEM, payload: { index, newInfo: info } });
+            console.log('update data: ', data);
+            console.log('data.index: ', index);
+            dispatch({ type: LISTEN_UPDATE_POST, payload: { index, newInfo: info } });
         });
     }
 }
@@ -186,7 +196,10 @@ const initialState = Map({
         status: 'INIT',
         error: -1
     }),
-    items: List([])
+    items: Map({
+        posts: List(),
+        symbols: List()
+    })
 });
 
 export default handleActions({
@@ -245,9 +258,10 @@ export default handleActions({
         }));
     },
     [GET_ITEMS_SUCCESS]: (state, action) => {  
-        const items = action.payload;        
+        const { posts, symbols } = action.payload;        
         return state.setIn(['info', 'status'], 'SUCCESS')
-                    .set('items', List(items)); 
+                    .setIn(['items', 'posts'], List(posts))
+                    .setIn(['items', 'symbols'], List(symbols)) 
     },
     [GET_ITEMS_FAILURE]: (state, action) => {
         const error = action.payload;
@@ -272,21 +286,25 @@ export default handleActions({
             error: error
         }));
     },
-    [LISTEN_GET_ITEM]: (state, action) => {
-        const item = action.payload;
-        return state.update('items', items => items.push(item));
+    [LISTEN_GET_POST]: (state, action) => {
+        const post = CreateItem(action.payload);
+        return state.updateIn(['items', 'posts'], posts => posts.push(post));
     }, 
-    [LISTEN_DELETE_ITEM]: (state, action) => {
+    [LISTEN_GET_SYMBOL]: (state, action) => {
+        const symbol = CreateItem(action.payload);
+        return state.updateIn(['items', 'symbols'], symbols => symbols.push(symbol));
+    }, 
+    [LISTEN_DELETE_POST]: (state, action) => {
         const index = action.payload;
-        return state.update('items', items => items.splice(index, 1));
+        return state.updateIn(['items', 'posts'], items => items.splice(index, 1));
     },
-    [LISTEN_UPDATE_ITEM]: (state, action) => {
+    [LISTEN_UPDATE_POST]: (state, action) => {
         const { index, newInfo } = action.payload;
-        const KEYS = [ 'text', 'likes' ];    
+        const KEYS = ['text', 'likes'];    
 
-        return state.updateIn(['items', index, 'info'], info => {
+        return state.updateIn(['items', 'posts', index, 'info'], info => {
             return KEYS.reduce((map, key) => {
-                return map.set(key, newInfo[key]) 
+                return map.set(key, newInfo[key])
             }, info);
         });
     }

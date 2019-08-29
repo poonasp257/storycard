@@ -3,37 +3,46 @@ import styled from 'styled-components';
 import { NumberWithCommas } from 'lib/Utility';
 
 import { connect } from 'react-redux';
-import { LikeRequest } from 'modules/post';
+import { LikeRequest } from 'modules/item';
 
 import ReactSVG from 'react-svg';
-import heart from 'resources/SVG/heart.svg';
+import heart from 'resources/main/SVG/heart.svg';
+
+const containerStyle = {
+    activated: `
+        left: 20px; 
+        top: 310px;
+        font-size: 14px;
+    `,
+    deactivated: `
+        left: 35px; 
+        top: 45px;
+        font-size: 10px;    
+    `
+};
 
 const Container = styled.div`
-    position: absolute;
-    ${props => props.mode ? 'left: 20px; top: 310px;' 
-        : 'left: 80px; top: 100px;'
-    }
-    font-family: 'Space Mono', monospace;
-    font-size: 14px;
-    font-weight: bold;
     display: flex;
+    position: absolute;
+    ${props => props.mode ? containerStyle.activated : containerStyle.deactivated}
+    font-weight: bold;
+    font-family: 'Space Mono', monospace;
 `;
 
 const Heart = styled(ReactSVG)`
-    width: 20px; 
     display: inline-block;
     margin-right: 5px;
     cursor: pointer;
     .cls-12 { 
         fill: ${props => props.isLiked ? '#e83e19' : 'none'};
     }
-    ${props => !props.mode ? '' : `    
-        :hover {
-            .cls-12 {
-                fill: ${props.isLiked ? 'none' : '#e83e19'};
-            }
+    ${props => props.mode ? `
+    width: 20px;
+    :hover {
+        .cls-12 {
+            fill: ${props => props.isLiked ? 'none' : '#e83e19'};
         }
-    `}
+    }` : `width: 12px;`}
 `;
 
 const Count = styled.div`
@@ -53,7 +62,7 @@ class Like extends Component {
     handleClick = (event) => {
         const { likes, isLiked } = this.state;
         const index = likes.findIndex(username => username === this.props.username);
-         
+
         this.props.LikeRequest(this.props.postId, index).then(
             () => {    
                 this.setState({ isLiked: !isLiked });
@@ -61,16 +70,7 @@ class Like extends Component {
     }
 
     static getDerivedStateFromProps(nextProps, prevState) {
-        //console.log('Like component get new props...', nextProps.likes);
-
         return { likes: nextProps.likes };
-    }
-
-    shouldComponentUpdate(nextProps, nextState) {
-        const isUpdated = (JSON.stringify(nextProps) != JSON.stringify(this.props))
-            || (JSON.stringify(nextState) != JSON.stringify(this.state));
-
-        return isUpdated;
     }
 
     render() {
@@ -89,7 +89,7 @@ class Like extends Component {
 const mapStateToProps = (state) => {
     return {
         username: state.authentication.getIn(['status', 'currentUser']),
-        status: state.post.get(['like', 'status'])
+        status: state.item.get(['like', 'status'])
     };
 }
 

@@ -2,10 +2,10 @@ import React, { Component } from 'react';
 import styled from 'styled-components';
 import $ from 'jquery';
 import Materialize from 'materialize-css';
-import { Toolkit, Board, Icon } from 'components';
+import { Toolkit, Board, Icon, BackButton } from 'components';
 import { connect } from 'react-redux';
 import { getStatusRequest, logoutRequest } from 'modules/authentication';
-import { getItemsRequest, updateItems } from 'modules/post';
+import { getItemsRequest, updateItems } from 'modules/item';
 import io from 'socket.io-client';
 
 const Container = styled.div`
@@ -45,7 +45,7 @@ class Main extends Component {
     constructor(props) {
         super(props);
 
-        this.socket = io.connect('http://localhost:5000');
+        //this.socket = io.connect('http://localhost:5000');
     }
 
     handleLogin = () => {
@@ -76,7 +76,7 @@ class Main extends Component {
                             isLoggedIn: false,
                             username: ''
                         };
-
+                        
                         document.cookie = 'key=' + btoa(JSON.stringify(loginData));
 
                         const $toastContent = $('<span style="color: #FFB4BA">Your session is expired, please log in again</span>');
@@ -100,39 +100,34 @@ class Main extends Component {
             }
         );
     }
-
+    
     getItems = () => {
-        const postId = this.props.location.pathname.split('/').pop();        
-        const info = (postId === 'main') ? { tag: 'post' } : { tag: 'symbol', postId: postId };
-
-        this.props.getItemsRequest(info).then(
+        this.props.getItemsRequest().then(
             () => {
 
             });
     }
 
     componentDidMount() {
-        this.handleLogin().then(
-            (success) => {
-                if (!success) return;
+        // this.handleLogin().then(
+        //     (success) => {
+        //         if (!success) return;
 
-                this.getItems();
-                this.props.updateItems(this.socket);
-            }
-        );
+        //         this.getItems();
+        //         this.props.updateItems(this.socket);
+        //     }
+        // );
     }
 
     componentWillUnmount() {
-        this.socket.removeAllListeners();
+        //this.socket.removeAllListeners();
     }
 
     render() {
         return (
             <Container>
                 <Header>
-                    <Button onClick={() => window.location.href = '/main'}>
-                        <Icon type="home" size="24px" />
-                    </Button>
+                    <BackButton to="/" size="24px"/>
                     <Button onClick={this.handleLogout}>
                         <Icon type="person" size="24px"/>
                         <Name>Logout</Name>
@@ -149,7 +144,7 @@ const mapStateToProps = (state) => {
     return {
         status: {
             auth: state.authentication.get('status'),
-            items: state.post.getIn(['info', 'status'])
+            items: state.item.getIn(['info', 'status'])
         }
     };
 };
@@ -162,8 +157,8 @@ const mapDispatchToProps = (dispatch) => {
         logoutRequest: () => {
             return dispatch(logoutRequest());
         },
-        getItemsRequest: (info) => {
-            return dispatch(getItemsRequest(info));
+        getItemsRequest: () => {
+            return dispatch(getItemsRequest());
         },
         updateItems: (socket) => dispatch(updateItems(socket))
     };

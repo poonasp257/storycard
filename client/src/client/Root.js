@@ -10,7 +10,7 @@ import reducers from 'modules';
 
 const store = createStore(reducers, applyMiddleware(thunk));
 
-const Root = () => { 
+function Root() { 
     return (
         <BrowserRouter>
             <Provider store={store}>

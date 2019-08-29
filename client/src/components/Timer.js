@@ -7,14 +7,26 @@ const SEC =  MSEC * 60;
 const MINUTE = SEC * 60;
 const HOUR = MINUTE * 24;
 
+const containerStyle = {
+    activated: `
+        left: 180px; 
+        top: 0px; 
+        transform: translate(-50%, 0); 
+        margin: 10px;
+        font-size: 20px;
+    `,
+    deactivated: `
+        left: 13px; 
+        top: 20px;
+        font-size: 13px;
+    `
+};
+
 const Container = styled.div`
     position: absolute;
-    ${props => props.mode ? 
-        'left: 180px; top: 0px; transform: translate(-50%, 0); margin: 10px;' 
-        : 'left: 40px; top: 50px;'}
-    font-family: 'Space Mono', monospace;
-    font-size: 20px;
+    ${props => props.mode ? containerStyle.activated : containerStyle.deactivated}
     font-weight: bold;
+    font-family: 'Space Mono', monospace;
 `;
 
 class Timer extends Component {    

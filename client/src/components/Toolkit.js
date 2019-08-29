@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import { ItemList, Post, Symbol, Icon } from 'components';
+import { ItemList, Post, Symbol } from 'components';
 
 import ReactSVG from 'react-svg';
-import background from 'resources/SVG/board-toolkit.svg';
-import toolkitButton from 'resources/SVG/board-toolkitButton.svg';
-import toolBubble1 from 'resources/SVG/toolBubble1.svg';
-import toolBubble2 from 'resources/SVG/toolBubble2.svg';
+import background from 'resources/main/SVG/board-toolkit.svg';
+import toolkitButton from 'resources/main/SVG/board-toolkitButton.svg';
+import toolBubble1 from 'resources/main/SVG/toolBubble1.svg';
+import toolBubble2 from 'resources/main/SVG/toolBubble2.svg';
 
 const Container = styled.div`    
     position: fixed;
@@ -53,7 +53,7 @@ const ToolkitButton = styled(ReactSVG)`
 
 const ToolkitBox = styled.div`
     float: left;
-    margin: 15px 0px 0px 25px;
+    margin: 15px 0px 0px 35px;
 `;
 
 const Name = styled.span`    
@@ -105,9 +105,9 @@ class Toolkit extends Component {
                     <ToolkitButton src={toolkitButton} onClick={this.handleMenu}/>
                     <ToolkitBox>
                         <Name>Toolkit</Name>                        
-                        <ItemList bg={toolBubble1} category="conflict" Item={Symbol} tag="symbol" targetTag="board"/>
-                        <ItemList bg={toolBubble1} category="resolution" Item={Symbol} tag="symbol" targetTag="board"/>
-                        <ItemList bg={toolBubble2} category="post" Item={Post} tag="post" targetTag="board"/>
+                        <ItemList bg={toolBubble1} category="conflict" Item={Symbol} tag="symbol" targetTag="board" size={45} itemSpacing={7}/>
+                        <ItemList bg={toolBubble1} category="resolution" Item={Symbol} tag="symbol" targetTag="board" size={40} itemSpacing={10}/>
+                        <ItemList bg={toolBubble2} category="post" Item={Post} tag="post" targetTag="board" size={45} itemSpacing={10}/>
                     </ToolkitBox>
                 </Content>
             </Container>
