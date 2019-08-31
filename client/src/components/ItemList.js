@@ -4,37 +4,34 @@ import PropTypes from 'prop-types';
 import ResourceLoader from 'lib/ResourceLoader';
 import { Draggable } from 'components';
 
-import ReactSVG from 'react-svg';
-
 const Container = styled.div`
-    position: relative;
-    margin: 20px auto;
+    margin: 20px 20px 20px 0px;
 `;
 
-const Background = styled(ReactSVG)`
-    width: 350px;
-`;
-
-const Category = styled.span`
-    position: absolute;
-    left: 25px;
-    top: 5px;
+const Category = styled.div`
+    width: fit-content;
+    padding: 5px 25px 2px 25px;
+    border-radius: 15px 15px 0px 0px;
     color: #fefae7;
+    background-color: #e83c18;
     font-size: 21px; 
     font-family: 'Do Hyeon', sans-serif;
 `;
 
-const List = styled.div`
-    position: absolute;
-    left: ${props => props.tag === 'symbol' ? 15 : 0}px;
-    top: ${props => props.tag === 'symbol' ? 30 : 33}px;
+const Content = styled.div` 
     width: 350px;
-    margin: 10px;
+    margin: 0 auto;
+    border-radius: 0px 30px 0px 30px; 
+    background-color: #fefae7;
+`;
+
+const List = styled.div`
+    text-align: center;
 `;
 
 const ItemContainer = styled.div`
-    float: left;
-    margin: ${props => props.spacing}px;
+    display: inline-block;
+    margin: 10px;
 `;
 
 const LAGNGUAGE = {
@@ -43,13 +40,13 @@ const LAGNGUAGE = {
     'post': '직접입력'
 };
 
-function ItemList({ bg, category, Item, tag, targetTag, size, itemSpacing }) {
-    let items = [];
+function ItemList({ bg, category, Item, tag, targetTag, size }) {
     const resources = ResourceLoader(category);
+    let items = [];
 
     for(let i = 0; i < resources.length; ++i) {
         items.push(
-            <ItemContainer key={items.length} spacing={itemSpacing}>
+            <ItemContainer key={items.length}>
                 <Draggable category={category} type={i} tag={tag} targetTag={targetTag}>
                     <Item resource={resources[i]} size={size} mode={false}/>
                 </Draggable>
@@ -60,9 +57,10 @@ function ItemList({ bg, category, Item, tag, targetTag, size, itemSpacing }) {
     let translatedCategory = LAGNGUAGE[category];
     return (
         <Container>
-            <Background src={bg}/>
             <Category>{translatedCategory}</Category>
-            <List tag={tag}>{items}</List>
+            <Content>
+                <List>{items}</List>
+            </Content>
         </Container>
     );
 };

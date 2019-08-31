@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { BackButton } from 'components';
+import { ArrowButton } from 'components';
 
 import background from 'resources/credit/PNG/paper01.png';
 import title from 'resources/credit/PNG/title.png';
@@ -54,29 +54,29 @@ function Credit() {
 
     return (
         <Container>
-            <Button><BackButton to="/" size="30px"/></Button>
+            <Button><ArrowButton to="/" size="30px"/></Button>
             <Content>
-                <Title src={title} />
+                <Title src={title} draggable="false"/>
                 <ProfessorList>
-                    <Professor name="Hyun-Jee Kim" role="Assistant Professor" photo={photo01}>
+                    <Professor name="Hyun-Jee Kim" rank="Assistant Professor" photo={photo01}>
                         School of Games, Game Graphic Design,<br/>
                         Hongik University
                     </Professor>
-                    <Professor name="Byung-Chull Bae" role="Assistant Professor" photo={photo02}>
+                    <Professor name="Byung-Chull Bae" rank="Assistant Professor" photo={photo02}>
                         School of Games, Game Software,<br/>
                         Hongik University
                     </Professor>
                 </ProfessorList>
                 <StudentList>
-                    <Student bg={profile01} name="Lee Hye-rin" photo={photo03}>
+                    <Student bg={profile01} width={476} height={199} left="55%" top="45%" name="Lee Hye-rin" photo={photo03}>
                         Digital Media Design,<br/>
                         Hongik University
                     </Student>
-                    <Student bg={profile02} name="Lee Jun Young" photo={photo04}>
+                    <Student bg={profile02} width={471} height={215} left="50%" top="50%" name="Lee Jun Young" photo={photo04}>
                         Game Software,<br/>
                         Hongik University
                     </Student>
-                    <Student bg={profile03} name="O Neul" photo={photo05}>
+                    <Student bg={profile03} width={483} height={211} left="55%" top="45%" name="O Neul" photo={photo05}>
                         Digital Media Design,<br/>
                         Hongik University
                     </Student>
@@ -86,7 +86,7 @@ function Credit() {
     );
 };
 
-function Professor({ name, photo, role, children }) {
+function Professor({ name, photo, rank, children }) {
     const Container = styled.div`
         display: inline-block;
         width: fit-content;
@@ -118,7 +118,7 @@ function Professor({ name, photo, role, children }) {
         float: right;
     `;
 
-    const Role = styled.div`
+    const Rank = styled.div`
         margin-bottom: 10px;
         color: #7772b4;
     `;
@@ -131,20 +131,20 @@ function Professor({ name, photo, role, children }) {
     return (
         <Container>
             <Name>{name}</Name>
-            <Photo src={photo}/>
+            <Photo src={photo} draggable="false"/>
             <Content>
-                <Role>{role}</Role>
+                <Rank>{rank}</Rank>
                 <Description>{children}</Description>
             </Content>
         </Container>
     );
 }
 
-function Student({ bg, name, photo, role, children }) {
+function Student({ bg, width, height, left, top, name, photo, children }) {
     const OutContainer = styled.div`
         position: relative;
-        width: 500px;
-        height: 210px;
+        width: ${width}px;
+        height: ${height}px;
         display: inline-block;
         background: url(${bg});
         background-repeat: no-repeat;
@@ -153,9 +153,9 @@ function Student({ bg, name, photo, role, children }) {
 
     const InContainer = styled.div`
         position: absolute;
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%);
+        left: ${left};
+        top: ${top};
+        transform: translate(-${left}, -${top});
         width: fit-content;
         text-align: left;
     `;
@@ -191,7 +191,7 @@ function Student({ bg, name, photo, role, children }) {
     return (
         <OutContainer>
             <InContainer>
-                <Photo src={photo}/>
+                <Photo src={photo} draggable="false"/>
                 <Content>
                     <Name>{name}</Name>
                     <Description>{children}</Description>

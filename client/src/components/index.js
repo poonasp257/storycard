@@ -9,7 +9,7 @@ import Like from './Like';
 import Timer from './Timer';
 import TextBox from './TextBox';
 import Icon from './Icon';
-import BackButton from './BackButton';
+import ArrowButton from './ArrowButton';
 
 export {
     Authentication,
@@ -23,5 +23,5 @@ export {
     Timer,
     TextBox,
     Icon,
-    BackButton
+    ArrowButton
 };

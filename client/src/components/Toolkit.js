@@ -1,58 +1,39 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import { ItemList, Post, Symbol } from 'components';
-
-import ReactSVG from 'react-svg';
-import background from 'resources/main/SVG/board-toolkit.svg';
-import toolkitButton from 'resources/main/SVG/board-toolkitButton.svg';
-import toolBubble1 from 'resources/main/SVG/toolBubble1.svg';
-import toolBubble2 from 'resources/main/SVG/toolBubble2.svg';
+import Icon from './Icon';
 
 const Container = styled.div`    
     position: fixed;
-    right: -400px;
+    right: -405px;
     z-index: 1;
     transition: transform 0.6s ease;
     transform: translateX(${ props => {
-        if(props.isOpened) return -400;
-        else return 0; 
-    }}px);
+        if(props.isOpened) return '-405px';
+        else return '0px'; 
+    }});
 `;
 
-const Background = styled(ReactSVG)`
-    width: 450px;
-    height: 863px;
-    cls-1 {
-        fill:#f5cf49;
+const Button = styled.div`
+    float: left;
+    padding: 3px 4px 3px 5px;
+    border-radius: 30px 0px 0px 30px; 
+    cursor: pointer;
+    color: #fefae7;
+    background-color: #e83c18;
+    :hover {
+        color: #e83c18;
+        background-color: #fefae7;;
     }
-    cls-2 {
-        fill:#e73e19;
-    }
-    :hover {}
 `;
 
 const Content = styled.div`   
-    position: absolute;
-    left: 11.2px;
-    top: 0px;
-    width: 100%;
-    height: 100%;
+    float: right;
+    border-radius: 0px 0px 0px 30px;
+    background-color: #f5c620;
 `;
 
-const ToolkitButton = styled(ReactSVG)`
-    float: left;
-    width: 50px;
-    cursor: pointer;
-    .cls-2 { fill:#e73e19; }
-    .cls-3 { fill:#fdf9e6; }
-    :hover {
-        .cls-2 { fill:#fdf9e6; }
-        .cls-3 { fill:#e73e19; }
-    }
-`;
-
-const ToolkitBox = styled.div`
-    float: left;
+const Box = styled.div`
     margin: 15px 0px 0px 35px;
 `;
 
@@ -100,19 +81,23 @@ class Toolkit extends Component {
     render() { 
         return (
             <Container isOpened={this.state.isOpened}>
-                <Background src={background}/>
+                <Button onClick={this.handleMenu}>
+                    <Icon type="brush" size="24px"/>
+                </Button>
                 <Content>
-                    <ToolkitButton src={toolkitButton} onClick={this.handleMenu}/>
-                    <ToolkitBox>
-                        <Name>Toolkit</Name>                        
-                        <ItemList bg={toolBubble1} category="conflict" Item={Symbol} tag="symbol" targetTag="board" size={45} itemSpacing={7}/>
-                        <ItemList bg={toolBubble1} category="resolution" Item={Symbol} tag="symbol" targetTag="board" size={40} itemSpacing={10}/>
-                        <ItemList bg={toolBubble2} category="post" Item={Post} tag="post" targetTag="board" size={45} itemSpacing={10}/>
-                    </ToolkitBox>
+                    <Box>
+                        <Name>Toolkit</Name>
+                        <ItemList category="conflict" Item={Symbol} tag="symbol" targetTag="board" size={45} />
+                        <ItemList category="resolution" Item={Symbol} tag="symbol" targetTag="board" size={40} />
+                        <ItemList category="post" Item={Post} tag="post" targetTag="board" size={45} />
+                    </Box>
                 </Content>
             </Container>
         );
     };
 };
+
+
+
 
 export default Toolkit;

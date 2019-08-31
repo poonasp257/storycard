@@ -16,7 +16,7 @@ app.use(bodyParser.json());
 const db = mongoose.connection;
 db.on('error', console.error);
 db.once('open', () => { console.log('Connected to mongodb server'); });
-mongoose.connect('mongodb://localhost/storycard', {useNewUrlParser: true});
+mongoose.connect('mongodb://localhost/storycard', { useNewUrlParser: true });
 
 app.use(session({
     secret: '1$1$StoryCard@234',

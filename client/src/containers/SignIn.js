@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { connect } from 'react-redux';
 import $ from 'jquery';
 import Materialize from 'materialize-css';
-import { Authentication, BackButton } from 'components'
+import { Authentication, ArrowButton } from 'components'
 import { loginRequest } from 'modules/authentication';
 
 const Button = styled.div`
@@ -40,7 +40,7 @@ class SignIn extends Component {
     render() {
         return (
             <div>
-                <Button><BackButton to="/" size="30px"/></Button>
+                <Button><ArrowButton to="/" size="30px"/></Button>
                 <Authentication mode={true} onLogin={this.handleLogin} />
             </div>
         );

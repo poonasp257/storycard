@@ -14,7 +14,7 @@ function Root() {
     return (
         <BrowserRouter>
             <Provider store={store}>
-                <App />
+                <App/>
             </Provider>
         </BrowserRouter>
     );

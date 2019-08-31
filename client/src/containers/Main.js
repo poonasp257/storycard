@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import styled from 'styled-components';
 import $ from 'jquery';
 import Materialize from 'materialize-css';
-import { Toolkit, Board, Icon, BackButton } from 'components';
+import { Toolkit, Board, Icon, ArrowButton } from 'components';
 import { connect } from 'react-redux';
 import { getStatusRequest, logoutRequest } from 'modules/authentication';
 import { getItemsRequest, updateItems } from 'modules/item';
@@ -45,7 +45,7 @@ class Main extends Component {
     constructor(props) {
         super(props);
 
-        //this.socket = io.connect('http://localhost:5000');
+        this.socket = io.connect('http://localhost:5000');
     }
 
     handleLogin = () => {
@@ -109,32 +109,32 @@ class Main extends Component {
     }
 
     componentDidMount() {
-        // this.handleLogin().then(
-        //     (success) => {
-        //         if (!success) return;
+        this.handleLogin().then(
+            (success) => {
+                if (!success) return;
 
-        //         this.getItems();
-        //         this.props.updateItems(this.socket);
-        //     }
-        // );
+                this.getItems();
+                this.props.updateItems(this.socket);
+            }
+        );
     }
 
     componentWillUnmount() {
-        //this.socket.removeAllListeners();
+        this.socket.removeAllListeners();
     }
 
     render() {
         return (
             <Container>
                 <Header>
-                    <BackButton to="/" size="24px"/>
+                    <ArrowButton to="/" size="24px"/>
                     <Button onClick={this.handleLogout}>
                         <Icon type="person" size="24px"/>
                         <Name>Logout</Name>
                     </Button>
                 </Header>
-                <Toolkit />
-                <Board />
+                <Toolkit/>
+                <Board/>
             </Container>
         );
     };

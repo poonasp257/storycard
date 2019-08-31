@@ -17,7 +17,6 @@ const InContainer = styled.div`
     width: ${props => props.width}px;
     height: ${window.screen.height}px;
     background: url(${background}) repeat-x;
-    background-size: 50%;
 `;
 
 const DropZone = styled.div`
@@ -36,7 +35,6 @@ class Board extends Component {
         this.state = {
             scrollLeft: 0,
             width: window.screen.width * 2,
-            height: window.screen.height,
             items: null,
             contents: null
         };
@@ -49,7 +47,7 @@ class Board extends Component {
 
         this.ref.scrollLeft -= delta;
         if (maxScrollLeft * 0.8 < this.ref.scrollLeft) {
-            boardWidth *= 2;
+            boardWidth += window.screen.width;
         }
 
         this.setState({ 
@@ -76,7 +74,7 @@ class Board extends Component {
     } 
 
     render() {
-        const { width, height, contents } = this.state;
+        const { width, contents } = this.state;
 
         return (
             <OutContainer ref={r => this.ref = r} onWheel={this.handleWheel}>
