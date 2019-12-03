@@ -17,12 +17,10 @@ import photo05 from 'resources/credit/PNG/photo05.png';
 
 function Credit() {
     const Container = styled.div`    
-        width: 100%;
-        height: 100%;
         margin: 0 auto;
         background-image: url(${background});
         background-repeat: no-repeat;
-        background-size: auto;
+        background-size: ${window.screen.width}px ${window.screen.height / 1.8}px;
     `;
         
     const Button = styled.div`
@@ -39,18 +37,16 @@ function Credit() {
     `;
 
     const Title = styled.img`
-        margin-top: 130px;
+        margin-top: ${window.screen.height / 13}px;
     `;
 
     const ProfessorList = styled.div`
-        margin: 30px auto;
+        margin: 5px auto;
     `;
 
     const StudentList = styled.div`
-        margin: 320px auto;
+        margin: ${window.screen.height / 12}px auto;
     `;
-
-    
 
     return (
         <Container>
