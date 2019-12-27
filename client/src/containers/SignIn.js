@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import { connect } from 'react-redux';
-import $ from 'jquery';
-import Materialize from 'materialize-css';
 import { Authentication, ArrowButton } from 'components'
+
+import { connect } from 'react-redux';
+import { openAlert } from 'modules/popup';
 import { loginRequest } from 'modules/authentication';
 
 const Button = styled.div`
@@ -25,12 +25,10 @@ class SignIn extends Component {
 
                     document.cookie = 'key=' + btoa(JSON.stringify(loginData));
 
-                    Materialize.toast({ html: `Welcome, ${id}!` });
                     this.props.history.push('/main');
                     return true;
                 } else {
-                    let $toastContent = $('<span style="color: #FFB4BA">Incorrect username or password</span>');
-                    Materialize.toast({ html: $toastContent });
+                    this.props.openAlert({title: "Login", message: "Incorrect username or password"});
                     return false;
                 }
             }
@@ -57,7 +55,8 @@ const mapDispatchToProps = (dispatch) => {
     return {
         loginRequest: (id, pw) => {
             return dispatch(loginRequest(id, pw));
-        }
+        },
+        openAlert: ({title, message}) => dispatch(openAlert({title, message}))
     };
 };
 

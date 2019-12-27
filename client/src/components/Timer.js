@@ -9,21 +9,19 @@ const HOUR = MINUTE * 24;
 
 const containerStyle = {
     activated: `
-        left: 180px; 
-        top: 0px; 
-        transform: translate(-50%, 0); 
         margin: 10px;
         font-size: 20px;
     `,
     deactivated: `
-        left: 13px; 
-        top: 20px;
+        top: 20%;
         font-size: 13px;
     `
 };
 
 const Container = styled.div`
     position: absolute;
+    left: 50%;
+    transform: translate(-55%, 0);
     ${props => props.mode ? containerStyle.activated : containerStyle.deactivated}
     font-weight: bold;
     font-family: 'Space Mono', monospace;
@@ -33,8 +31,10 @@ class Timer extends Component {
     constructor(props) {
         super(props); 
         
-        const remainTime = HOUR - (Date.now() - Date.parse(props.created));
         this.timerID = null;
+
+        let remainTime = HOUR - (Date.now() - Date.parse(props.created));
+        if(remainTime < 0) remainTime = 0;
         this.state = {
             remainTime: remainTime,
             hour: Math.floor((remainTime % HOUR) / MINUTE),
@@ -42,13 +42,9 @@ class Timer extends Component {
             second: Math.floor((remainTime % SEC) / MSEC)
         };
     };
-    
-    ElipsedTime = () => {
-        if(this.state.remainTime <= 0) { 
-            clearTimeout(this.timerID);
-            return;
-        }
-        const remainTime = this.state.remainTime - 1000;
+
+    SetTimer = (remainTime) => {
+        if(remainTime < 0) remainTime = 0;
 
         this.setState({
             remainTime: remainTime,
@@ -56,6 +52,15 @@ class Timer extends Component {
             minute: Math.floor((remainTime % MINUTE) / SEC),
             second: Math.floor((remainTime % SEC) / MSEC)
         });
+    }
+    
+    ElipsedTime = () => {       
+        const remainTime = this.state.remainTime - 1000;
+        this.SetTimer(remainTime);
+
+        if(this.state.remainTime <= 0) { 
+            clearTimeout(this.timerID);
+        }
     }
 
     componentDidMount() {        
@@ -67,11 +72,11 @@ class Timer extends Component {
     }
 
     render() {
-        const { hour, minute, second } = this.state;
+        const { remainTime, hour, minute, second } = this.state;
         
         return (
             <Container mode={this.props.mode}>
-                {Pad(hour, 2)}:{Pad(minute, 2)}:{Pad(second, 2)}
+                {remainTime === 0 ? "TIMEOUT" : `${Pad(hour, 2)}:${Pad(minute, 2)}:${Pad(second, 2)}`}
             </Container>
         );
     };

@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import { connect } from 'react-redux';
-import $ from 'jquery';
-import Materialize from 'materialize-css';
 import { Authentication, ArrowButton } from 'components';
+
+import { connect } from 'react-redux';
+import { openAlert } from 'modules/popup';
 import { registerRequest } from 'modules/authentication';
 
 const Button = styled.div`
@@ -23,8 +23,7 @@ class SignUp extends Component {
                     };
 
                     document.cookie = 'key=' + btoa(JSON.stringify(loginData));
-
-                    Materialize.toast({ html: `Welcome, ${id}!` });
+                    
                     this.props.history.push('/main');
                     return true;
                 } else {
@@ -40,8 +39,7 @@ class SignUp extends Component {
                         'Username already exists'
                     ];
 
-                    let $toastContent = $('<span style="color: #FFB4BA">' + errorMessage[this.props.errorCode - 1] + '</span>');
-                    Materialize.toast({ html: $toastContent });
+                    this.props.openAlert({title: "Register", message: errorMessage[this.props.errorCode - 1]});
                     return false;
                 }
             }
@@ -69,7 +67,8 @@ const mapDispatchToProps = (dispatch) => {
     return {
         registerRequest: (id, pw) => {
             return dispatch(registerRequest(id, pw));
-        }
+        },
+        openAlert: ({title, message}) => dispatch(openAlert({title, message}))
     };
 };
 

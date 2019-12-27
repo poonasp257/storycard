@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import $ from 'jquery';
-import Materialize from 'materialize-css';
 import { Toolkit, Board, Icon, ArrowButton } from 'components';
+
 import { connect } from 'react-redux';
+import { openAlert } from 'modules/popup';
 import { getStatusRequest, logoutRequest } from 'modules/authentication';
 import { getItemsRequest, updateItems } from 'modules/item';
+
 import io from 'socket.io-client';
 
 const Container = styled.div`
@@ -45,7 +46,7 @@ class Main extends Component {
     constructor(props) {
         super(props);
 
-        this.socket = io.connect('http://localhost:5000');
+        this.socket = io.connect('http://localhost:8000');
     }
 
     handleLogin = () => {
@@ -79,8 +80,8 @@ class Main extends Component {
                         
                         document.cookie = 'key=' + btoa(JSON.stringify(loginData));
 
-                        const $toastContent = $('<span style="color: #FFB4BA">Your session is expired, please log in again</span>');
-                        Materialize.toast({ html: $toastContent });
+                        this.props.openAlert({title: "Storycard", message: "Your session is expired, please log in again" });
+
                         window.location.href = "/signin";
                         reject(false);
                     }
@@ -95,7 +96,6 @@ class Main extends Component {
         this.props.logoutRequest().then(
             () => {
                 document.cookie = '';
-                Materialize.toast({ html: 'Good Bye!' });
                 window.location.href = "/signin";
             }
         );
@@ -160,7 +160,8 @@ const mapDispatchToProps = (dispatch) => {
         getItemsRequest: () => {
             return dispatch(getItemsRequest());
         },
-        updateItems: (socket) => dispatch(updateItems(socket))
+        updateItems: (socket) => dispatch(updateItems(socket)),
+        openAlert: ({title, message}) => dispatch(openAlert({title, message}))
     };
 };
 

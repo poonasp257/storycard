@@ -15,8 +15,10 @@ const OutContainer = styled.div`
 const InContainer = styled.div`
     position: relative;
     width: ${props => props.width}px;
-    height: ${window.screen.height}px;
-    background: url(${background}) repeat-x;
+    height: ${window.screen.height * 0.96}px;
+    background-image: url(${background});
+    background-size: contain;
+    background-repeat: repeat-x;
 `;
 
 const DropZone = styled.div`
@@ -60,9 +62,9 @@ class Board extends Component {
         const items = nextProps.items;
         const contents = items.map(item => {
             const itemLeft = parseInt(item.getIn(['info', 'left']), 10);
-            
+           
             if (prevState.scrollLeft - window.screen.width < itemLeft
-                && itemLeft < prevState.scrollLeft + window.screen.height) return item.get('content');
+                && itemLeft < prevState.scrollLeft + window.screen.width) return item.get('content');
             else return null;
         });
 

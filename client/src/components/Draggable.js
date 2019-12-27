@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import * as Utility from 'lib/Utility';
 
 import { connect } from  'react-redux';
+import { openConfirm } from 'modules/popup';
 import { attachItemRequest  } from 'modules/item'; 
 import { dragStart, dragEnd } from 'modules/drag';
 
@@ -98,9 +99,10 @@ class Draggable extends Component {
             //         if (Utility.IsOverlap(itemCollider, collider)) return false;
             //     }
         
-                if (window.confirm('Are you sure, you want to drop this?')) {
+            this.props.openConfirm({title: "", message: "Are you sure, you want to drop this?",
+                onConfirm: () => {
                     const { category, type, tag } = this.props;
-                    const size = ((tag === 'post') ? collider.width / 2 : collider.width / 2.5); 
+                    const size = (tag === 'post') ? collider.width / 2 : collider.width / 2.5; 
                     const left = parseInt(this.dragElem.style['left'], 10) 
                         - targetCollider.left - size;
                     const top = parseInt(this.dragElem.style['top'], 10) 
@@ -118,8 +120,8 @@ class Draggable extends Component {
             
                             }
                         }
-                    );    
-                }
+                    ); 
+                }});
             // }
         }
     }
@@ -151,7 +153,8 @@ const mapDispatchToProps = (dispatch) => {
             return dispatch(attachItemRequest(category, info));
         },
         dragStart: () => dispatch(dragStart()),
-        dragEnd: () => dispatch(dragEnd())
+        dragEnd: () => dispatch(dragEnd()),
+        openConfirm: (title, message, onConfirm) => dispatch(openConfirm(title, message, onConfirm))
     };
 };
 

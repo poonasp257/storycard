@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import Materialize from 'materialize-css';
+
+import { connect } from 'react-redux';
+import { openAlert } from 'modules/popup';
 
 const Container = styled.div`
     margin: 200px auto;
@@ -97,8 +99,8 @@ class Authentication extends Component {
 
     handleLogin = () => {
         const { username, password } = this.state;
-        if (password === "") { 
-            Materialize.toast({ html: `The password field is empty` });
+        if (username === "" || password === "") {
+            this.props.openAlert({title: "Login", message: "The username or password field is empty"});
             return;
         }
 
@@ -111,6 +113,10 @@ class Authentication extends Component {
 
     handleRegister = () => {
         const { username, password } = this.state;
+        if (username === "" || password === "") {
+            this.props.openAlert({title: "Register", message: "The username or password field is empty"});
+            return;
+        }
 
         this.props.onRegister(username, password).then(
             (result) => {
@@ -178,4 +184,10 @@ class Authentication extends Component {
     }
 }
 
-export default Authentication;
+const mapDispatchToProps = (dispatch) => {
+    return {
+        openAlert: ({title, message}) => dispatch(openAlert({title, message}))
+    };
+};
+
+export default connect(null, mapDispatchToProps)(Authentication);

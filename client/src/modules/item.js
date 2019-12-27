@@ -148,8 +148,6 @@ export function updateItems(socket) {
 
         socket.on('update', (data) => {
             const { index, info } = data;
-            console.log('update data: ', data);
-            console.log('data.index: ', index);
             dispatch({ type: LISTEN_UPDATE_POST, payload: { index, newInfo: info } });
         });
     }

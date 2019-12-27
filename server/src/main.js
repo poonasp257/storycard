@@ -7,7 +7,7 @@ import session from 'express-session';
 import api from './routes';
 
 const app = express();
-const port = 5000;
+const port = 8000;
 const io = require('socket.io').listen(app.listen(port));
 
 app.use(morgan('dev'));

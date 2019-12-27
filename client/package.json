@@ -8,7 +8,6 @@
     "jquery": "^3.4.1",
     "list-react-files": "^0.2.0",
     "lodash": "^4.17.15",
-    "materialize-css": "^1.0.0-rc.2",
     "prop-types": "^15.7.2",
     "react": "^16.8.6",
     "react-addons-update": "^15.6.2",
