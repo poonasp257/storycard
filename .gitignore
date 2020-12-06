@@ -4,7 +4,10 @@
 coverage
 
 # production
-build
+client
+
+test
+
 
 # misc
 .DS_Store
