@@ -5,7 +5,7 @@ import { NumberWithCommas } from 'lib/Utility';
 import { connect } from 'react-redux';
 import { LikeRequest } from 'modules/item';
 
-import ReactSVG from 'react-svg';
+import { ReactSVG } from 'react-svg';
 import heart from 'resources/main/SVG/heart.svg';
 
 const containerStyle = {

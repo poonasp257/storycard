@@ -1,51 +1,49 @@
 import express from 'express';
 import Account from '../models/account';
 
+import { checkEmailFormat, checkUsernameFormat, checkPasswordFormat } from '../modules/validation';
+
 const router = express.Router();
 
-router.post('/signup', (req, res) => {
-    let userNameRegex = /^[a-z0-9]+$/;
+router.post('/signup', (request, response) => {
+    const { username, password } = request.body;
 
-    if(!userNameRegex.test(req.body.username)) {
-        return res.status(400).json({
+    if (!checkUsernameFormat(username)) {
+        return response.json({
             error: "BAD USERNAME",
             code: 1
         });
     }
 
-    if(req.body.password.length < 4 ||
-        typeof req.body.password !== "string") {
-        return res.status(400).json({
+    if (!checkPasswordFormat(password)) {
+        return response.json({
             error: "BAD PASSWORD",
             code: 2
         });
     }
 
-    Account.findOne({ username: req.body.username }, (err, exists) => {
+    Account.findOne({ username }, (err, exists) => {
         if(err) throw err;
         if(exists) {
-            return res.status(409).json({
+            return response.status(409).json({
                 error: "USERNAME EXISTS",
                 code: 3
             });
         }
 
-        let account = new Account({
-            username: req.body.username,
-            password: req.body.password
-        });
+        let account = new Account({ username, password });
 
         account.password = account.generateHash(account.password);
 
         account.save(err => {
             if(err) throw err;
 
-            req.session.loginInfo = {
+            request.session.loginInfo = {
                 _id: account._id,
                 username: account.username
             };
 
-            return res.json({ success: true });
+            return response.json({ success: true });
         });
     });
 });

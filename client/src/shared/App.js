@@ -1,6 +1,15 @@
 import React, { Component } from 'react';
 import { Route, Switch } from 'react-router-dom';
-import { Title, Main, Tutorial, Credit, SignIn, SignUp, Popups } from 'containers';
+import { 
+  NoMatch, 
+  Title, 
+  Main, 
+  Tutorial, 
+  Credit, 
+  SignIn, 
+  SignUp, 
+  Popups 
+} from 'containers';
 
 class App extends Component {
   render() {
@@ -13,6 +22,7 @@ class App extends Component {
           <Route path="/main" component={Main}/>
           <Route path="/tutorial" component={Tutorial}/>
           <Route path="/credit" component={Credit}/>
+          <Route component={NoMatch}/>
         </Switch>
         <Popups/>
       </div>

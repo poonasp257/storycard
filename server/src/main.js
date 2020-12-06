@@ -5,26 +5,26 @@ import bodyParser from 'body-parser';
 import mongoose from 'mongoose';
 import session from 'express-session';
 import api from './routes';
+import { logger } from './modules/logger';
 
 const app = express();
-const port = 8000;
-const io = require('socket.io').listen(app.listen(port));
+const server = require('http').createServer(app);
+const io = require('socket.io')(server);
+const morganFormat = process.env.NODE_ENV === "development" ? "dev" : "common";
 
-app.use(morgan('dev'));
+//app.use(morgan(morganFormat));
 app.use(bodyParser.json());
 
 const db = mongoose.connection;
 db.on('error', console.error);
 db.once('open', () => { console.log('Connected to mongodb server'); });
-mongoose.connect('mongodb://localhost/storycard', { useNewUrlParser: true });
+mongoose.connect('mongodb://localhost/collaboArt', { useNewUrlParser: true, useUnifiedTopology: true });
 
 app.use(session({
-    secret: '1$1$StoryCard@234',
+    secret: '1$1$collaboArt@234',
     resave: false,
     saveUninitialized: true
 }));
-
-app.use('/', express.static(path.resolve(__dirname, '../../client/build'))); 
 
 app.use((req, res, next) => {
     req.io = io;
@@ -33,11 +33,16 @@ app.use((req, res, next) => {
 
 app.use('/api', api);
 
-app.get('*', (req, res) => {
-    res.sendFile(path.resolve(__dirname, '../../client/build/index.html'));
+const routeDir = path.resolve(__dirname, '../../client/build');
+app.use(express.static(routeDir)); 
+app.get('*', (req, res) => res.sendFile(path.resolve(routeDir, 'index.html')));
+
+app.use((err, req, res) => {
+    logger.error(err.stack);
+    res.status(500).send('Something broke!');
 });
 
-app.use(function(err, req, res, next) {
-    console.error(err.stack);
-    res.status(500).send('Something broke!');
+const port = 9090;
+server.listen(port, () => {
+    logger.info(`server listening on port ${port}`);
 });

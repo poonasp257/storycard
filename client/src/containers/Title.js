@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 
-import ReactSVG from 'react-svg';
+import { ReactSVG } from 'react-svg';
 import title from 'resources/title/SVG/title.svg';
 import start from 'resources/title/PNG/start.png';
 import tutorial from 'resources/title/PNG/tutorial.png';
