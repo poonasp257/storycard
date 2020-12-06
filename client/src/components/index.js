@@ -7,7 +7,7 @@ import ItemList from './ItemList';
 import Draggable from './Draggable';
 import Like from './Like';
 import Timer from './Timer';
-import TextBox from './Textbox';
+import TextBox from './TextBox';
 import Icon from './Icon';
 import ArrowButton from './ArrowButton';
 

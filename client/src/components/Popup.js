@@ -2,8 +2,12 @@ import React, { Component } from 'react';
 import styled from 'styled-components';
 
 const Container = styled.div`
-    margin: 25% auto;
-    width: 25%;
+    position: absolute;    
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 365px;
+    margin: 0 auto;
     padding: 30px 25px 5px 25px;
     border-radius: 10px;
     background-color: #f5c620;

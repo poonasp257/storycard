@@ -10,9 +10,10 @@ import { logger } from './modules/logger';
 const app = express();
 const server = require('http').createServer(app);
 const io = require('socket.io')(server);
-const morganFormat = process.env.NODE_ENV === "development" ? "dev" : "common";
+const isDevMode = process.env.NODE_ENV === "development";
+const morganFormat = isDevMode ? "dev" : "common";
 
-//app.use(morgan(morganFormat));
+app.use(morgan(morganFormat));
 app.use(bodyParser.json());
 
 const db = mongoose.connection;
