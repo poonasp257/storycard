@@ -4,10 +4,8 @@
 coverage
 
 # production
-client
-
-test
-
+build
+node_modules
 
 # misc
 .DS_Store
