@@ -113,21 +113,13 @@ class Authentication extends Component {
 
     handleRegister = () => {
         const { username, password } = this.state;
+
         if (username === "" || password === "") {
             this.props.openAlert({title: "Register", message: "The username or password field is empty"});
             return;
         }
 
-        this.props.onRegister(username, password).then(
-            (result) => {
-                if (!result) {
-                    this.setState({
-                        username: '',
-                        password: ''
-                    });
-                }
-            }
-        );
+        this.props.onRegister(username, password);
     }
 
     handleKeyPress = (e) => {

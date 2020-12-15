@@ -35,9 +35,14 @@ export function registerRequest(username, password) {
         
         return axios.post('/api/account/signup', { username, password })
             .then((response) => {
+                if (response.data.error) {
+                    dispatch(registerFailure());
+                    return response.data.error;
+                }
+                
                 dispatch(registerSuccess(username));
             }).catch((error) => {
-                dispatch(registerFailure(error.response.data.code));
+                dispatch(registerFailure());
             });
     };
 }
@@ -118,21 +123,16 @@ export default handleActions({
     },
     [REGISTER_SUCCESS]: (state, action) => {
         const username = action.payload;
-
-        return state.setIn(['register', 'status'], 'SUCCESS')
-                    .setIn(['login', 'status'], 'SUCCESS')
+        return state.setIn(['login', 'status'], 'SUCCESS')
                     .set('status', Map({
                         isLoggedIn: true,
                         currentUser: username
                     }));
     },
     [REGISTER_FAILURE]: (state, action) => {
-        const error = action.payload;
-
         return state.set('register', Map({
-            status: 'FAILURE',
-            error: error
-        }));
+                        status: 'FAILURE'
+                    }));
     },
     [GET_STATUS]: (state, action) => {
         return state.setIn(['status', 'isLoggedIn'], true);

@@ -1,49 +1,52 @@
 import express from 'express';
 import Account from '../models/account';
+import { logger } from '../modules/logger';
 
-import { checkEmailFormat, checkUsernameFormat, checkPasswordFormat } from '../modules/validation';
+import { isCorrectUsernameFormat, isCorrectPasswordFormat } from '../modules/validation';
 
 const router = express.Router();
 
 router.post('/signup', (request, response) => {
     const { username, password } = request.body;
 
-    if (!checkUsernameFormat(username)) {
+    if (!isCorrectUsernameFormat(username)) {
         return response.json({
-            error: "BAD USERNAME",
-            code: 1
+            error: "incorrect username. username must be between 4-20 characters",
         });
     }
 
-    if (!checkPasswordFormat(password)) {
+    if (!isCorrectPasswordFormat(password)) {
         return response.json({
-            error: "BAD PASSWORD",
-            code: 2
+            error: "incorrect password. the password must be between 8-20 characters and contain a number",
         });
     }
 
-    Account.findOne({ username }, (err, exists) => {
-        if(err) throw err;
+    Account.findOne({ username: username }, (err, exists) => {
+        if(err) { 
+            logger.error(`${err}`);        
+            throw err;
+        }
+
         if(exists) {
-            return response.status(409).json({
-                error: "USERNAME EXISTS",
-                code: 3
+            return response.json({
+                error: `"${username}" is aleady exists`
             });
         }
 
         let account = new Account({ username, password });
-
         account.password = account.generateHash(account.password);
-
         account.save(err => {
-            if(err) throw err;
+           if(err) { 
+               logger.error(`${err}`);        
+               throw err;
+           }
 
-            request.session.loginInfo = {
-                _id: account._id,
-                username: account.username
-            };
+           request.session.loginInfo = {
+               _id: account._id,
+               username: account.username
+           };
 
-            return response.json({ success: true });
+           return response.json({ });
         });
     });
 });

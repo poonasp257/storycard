@@ -13,7 +13,7 @@ const io = require('socket.io')(server);
 const isDevMode = process.env.NODE_ENV === "development";
 const morganFormat = isDevMode ? "dev" : "common";
 
-app.use(morgan(morganFormat));
+//app.use(morgan(morganFormat));
 app.use(bodyParser.json());
 
 const db = mongoose.connection;

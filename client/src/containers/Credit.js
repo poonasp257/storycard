@@ -18,71 +18,82 @@ import photo05 from 'resources/credit/PNG/photo05.png';
 function Credit() {
     const Container = styled.div`    
         margin: 0 auto;
+        text-align: center;
+    `;
+
+    const TopContent = styled.div`   
+        height: ${window.screen.height / 1.8}px;
         background-image: url(${background});
         background-repeat: no-repeat;
         background-size: ${window.screen.width}px ${window.screen.height / 1.8}px;
     `;
-        
-    const Button = styled.div`
-        position: absolute;
-        left: 10%;
-        top: 7%;
+
+    const BottomContent = styled.div`   
+        margin: 0 auto;
+    `;
+
+    const Header = styled.div`
+        height: 60px;
+        padding-top: ${window.screen.height / 13}px;
+    `;
+
+    const BackButton = styled.div`
+        float: left;
+        margin-left: 200px;
     `; 
 
-    const Content = styled.div`    
-        text-align: center;
-        width: ${window.screen.width - 180 * 2}px;
-        height: ${window.screen.height}px;
-        margin-left: 180px;
-    `;
-
     const Title = styled.img`
-        margin-top: ${window.screen.height / 13}px;
+        float: left;
+        margin: 0 0 0 550px;
     `;
 
-    const ProfessorList = styled.div`
+    const MainNameCardList = styled.div`
         margin: 5px auto;
     `;
 
-    const StudentList = styled.div`
-        margin: ${window.screen.height / 12}px auto;
+    const NameCardList = styled.div`
+        margin: 30px auto;
     `;
 
     return (
         <Container>
-            <Button><ArrowButton to="/" size="30px"/></Button>
-            <Content>
-                <Title src={title} draggable="false"/>
-                <ProfessorList>
-                    <Professor name="Hyun-Jee Kim" rank="Assistant Professor" photo={photo01}>
-                        School of Games, Game Graphic Design,<br/>
+            <TopContent>
+                <Header>
+                    <BackButton><ArrowButton to="/" size="30px"/></BackButton>
+                    <Title src={title} draggable="false"/>
+                </Header>
+                <MainNameCardList>
+                    <MainNameCard name="Hyun-Jee Kim" rank="Assistant Professor" photo={photo01}>
+                        School of Games, Game Graphic Design,<br />
                         Hongik University
-                    </Professor>
-                    <Professor name="Byung-Chull Bae" rank="Assistant Professor" photo={photo02}>
-                        School of Games, Game Software,<br/>
+                    </MainNameCard>
+                    <MainNameCard name="Byung-Chull Bae" rank="Assistant Professor" photo={photo02}>
+                        School of Games, Game Software,<br />
                         Hongik University
-                    </Professor>
-                </ProfessorList>
-                <StudentList>
-                    <Student bg={profile01} width={476} height={199} left="55%" top="45%" name="Lee Hye-rin" photo={photo03}>
+                    </MainNameCard>
+                </MainNameCardList>
+            </TopContent>
+            <BottomContent>
+                <NameCardList>
+                    <NameCard bg={profile01} width={476} height={199} left="55%" top="45%" name="Lee Hye-rin" photo={photo03}>
                         Digital Media Design,<br/>
                         Hongik University
-                    </Student>
-                    <Student bg={profile02} width={471} height={215} left="50%" top="50%" name="Lee Jun Young" photo={photo04}>
+                    </NameCard>
+                    <NameCard bg={profile02} width={471} height={215} left="50%" top="50%" name="Lee Jun Young" photo={photo04}>
                         Game Software,<br/>
                         Hongik University
-                    </Student>
-                    <Student bg={profile03} width={483} height={211} left="55%" top="45%" name="O Neul" photo={photo05}>
+                    </NameCard>
+                    <NameCard bg={profile03} width={483} height={211} left="55%" top="45%" name="O Neul" photo={photo05}>
                         Digital Media Design,<br/>
                         Hongik University
-                    </Student>
-                </StudentList>
-            </Content>
+                    </NameCard>
+                </NameCardList>
+            </BottomContent>
         </Container>
     );
 };
 
-function Professor({ name, photo, rank, children }) {
+function MainNameCard({ name, photo, rank, children }) {
     const Container = styled.div`
         display: inline-block;
         width: fit-content;
@@ -136,7 +147,7 @@ function Professor({ name, photo, rank, children }) {
     );
 }
 
-function Student({ bg, width, height, left, top, name, photo, children }) {
+function NameCard({ bg, width, height, left, top, name, photo, children }) {
     const OutContainer = styled.div`
         position: relative;
         width: ${width}px;

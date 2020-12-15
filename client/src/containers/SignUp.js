@@ -15,33 +15,19 @@ const Button = styled.div`
 class SignUp extends Component {
     handleRegister = (id, pw) => {
         return this.props.registerRequest(id, pw).then(
-            () => {
-                if (this.props.status === "SUCCESS") {
-                    let loginData = {
-                        isLoggedIn: true,
-                        username: id
-                    };
-
-                    document.cookie = 'key=' + btoa(JSON.stringify(loginData));
-                    
-                    this.props.history.push('/main');
-                    return true;
-                } else {
-                    /*
-                        ERROR CODES:
-                            1: BAD USERNAME
-                            2: BAD PASSWORD
-                            3: USERNAME EXISTS
-                    */
-                    let errorMessage = [
-                        'Invalid Username',
-                        'Password is too short',
-                        'Username already exists'
-                    ];
-
-                    this.props.openAlert({title: "Register", message: errorMessage[this.props.errorCode - 1]});
-                    return false;
+            (error) => {
+                if (error) {
+                    this.props.openAlert({title: "Register", message: error });
+                    return;
                 }
+
+                let loginData = JSON.stringify({
+                    isLoggedIn: true,
+                    username: id
+                });
+
+                document.cookie = 'key=' + btoa(loginData);
+                this.props.history.push('/main');
             }
         );
     }
@@ -58,8 +44,7 @@ class SignUp extends Component {
 
 const mapStateToProps = (state) => {
     return {
-        status: state.authentication.getIn(['register', 'status']),
-        errorCode: state.authentication.getIn(['register', 'error'])
+        status: state.authentication.getIn(['register', 'status'])
     };
 };
 
