@@ -178,7 +178,7 @@ class Authentication extends Component {
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        openAlert: ({title, message}) => dispatch(openAlert({title, message}))
+        openAlert: (option) => dispatch(openAlert(option))
     };
 };
 

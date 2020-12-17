@@ -42,13 +42,21 @@ class Board extends Component {
         };
     }
 
+    handleMouseUp = (event) => {
+        if (1 !== event.button) return;
+
+        this.setState({
+            scrollLeft: this.ref.scrollLeft
+        });
+    }
+
     handleWheel = (event) => {
         const delta = event.nativeEvent.wheelDelta;
-        const maxScrollLeft = this.ref.scrollWidth - this.ref.clientWidth;
+        const maxScrollWidth = this.ref.scrollWidth - this.ref.clientWidth;
         let boardWidth = this.state.width;
 
         this.ref.scrollLeft -= delta;
-        if (maxScrollLeft * 0.8 < this.ref.scrollLeft) {
+        if (maxScrollWidth * 0.8 < this.ref.scrollLeft) {
             boardWidth += window.screen.width;
         }
 
@@ -68,18 +76,18 @@ class Board extends Component {
             else return null;
         });
 
-        return { items: items, contents: contents };
+        return { items, contents };
     }
-
-    shouldComponentUpdate(nextProps, nextState) {
-        return JSON.stringify(nextState) !== JSON.stringify(this.state);
-    } 
 
     render() {
         const { width, contents } = this.state;
 
         return (
-            <OutContainer ref={r => this.ref = r} onWheel={this.handleWheel}>
+            <OutContainer 
+                ref={r => this.ref = r} 
+                onWheel={this.handleWheel}
+                onMouseUp={this.handleMouseUp}
+            >
                 <InContainer width={width}>
                     <DropZone className="board" width={width}>
                         {contents}

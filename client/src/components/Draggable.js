@@ -74,38 +74,41 @@ class Draggable extends Component {
         
         document.removeEventListener('mousemove', this.handleMouseMove);
         document.removeEventListener('mouseup', this.handleMouseUp);
-        document.body.removeChild(this.dragElem);
         this.props.dragEnd();
     }
  
     Drop = (x, y) => {        
-        const targets = [...document.getElementsByClassName(this.props.targetTag)];
-        const filteredTargets = targets.filter(
-            (target) => {
-                let parentClass = target.parentNode.className;
-                return parentClass.search('draggable') < 0 ? true : false;
-            }
-        );        
-        const targetColliders = Utility.GetRects(filteredTargets);
+        const targets = [ ...document.getElementsByClassName(this.props.targetTag) ];
+        // const filteredTargets = targets.filter(
+        //     (target) => {
+        //         let parentClass = target.parentNode.className;
+        //         return parentClass.search('draggable') < 0;
+        //     }
+        // );
+        // const targetColliders = Utility.GetRects(filteredTargets);
+        //const targetColliders = Utility.GetRects(targets);    
         const collider = this.dragElem.getBoundingClientRect();
 
-        for(let targetCollider of targetColliders) {
+        for (const target of targets) {
+            const targetCollider = target.getBoundingClientRect();    
             if (!Utility.IsContaining(targetCollider, collider)) continue;
             
-            // for(let target of filteredTargets) {
-            //     const items = target.getElementsByClassName('item');
-            //     const itemColliders = Utility.GetRects(items);
-            //     for (let itemCollider of itemColliders) {
-            //         if (Utility.IsOverlap(itemCollider, collider)) return false;
-            //     }
-        
-            this.props.openConfirm({title: "", message: "Are you sure, you want to drop this?",
+            // if you don't want to overlapped other items... 
+            //const items = target.getElementsByClassName('item');
+            //const itemColliders = Utility.GetRects(items);
+            //for (let itemCollider of itemColliders) {
+            //    if (Utility.IsOverlap(itemCollider, collider)) return false;
+            //}
+
+            this.props.openConfirm({
+                title: "", 
+                message: "Are you sure, you want to drop this?",
                 onConfirm: () => {
                     const { category, type, tag } = this.props;
-                    const size = (tag === 'post') ? collider.width / 2 : collider.width / 2.5; 
-                    const left = parseInt(this.dragElem.style['left'], 10) 
+                    const size = (tag === 'post') ? collider.width / 2 : collider.width / 2.5;
+                    const left = parseInt(this.dragElem.style['left'], 10)
                         - targetCollider.left - size;
-                    const top = parseInt(this.dragElem.style['top'], 10) 
+                    const top = parseInt(this.dragElem.style['top'], 10)
                         - targetCollider.top - size;
                     const info = {
                         category,
@@ -114,15 +117,10 @@ class Draggable extends Component {
                         top: `${top}px`
                     };
 
-                    this.props.attachItemRequest(tag, info).then(
-                        () => {
-                            if (this.props.status === 'SUCCESS') {
-            
-                            }
-                        }
-                    ); 
-                }});
-            // }
+                    this.props.attachItemRequest(tag, info);
+                },
+                closeEvent: () => document.body.removeChild(this.dragElem)
+            });
         }
     }
 

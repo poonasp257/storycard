@@ -11,13 +11,13 @@ router.post('/signup', (request, response) => {
 
     if (!isCorrectUsernameFormat(username)) {
         return response.json({
-            error: "incorrect username. username must be between 4-20 characters",
+            error: "Incorrect username. username must be between 4-20 characters",
         });
     }
 
     if (!isCorrectPasswordFormat(password)) {
         return response.json({
-            error: "incorrect password. the password must be between 8-20 characters and contain a number",
+            error: "Incorrect password. the password must be between 8-20 characters and contain a number",
         });
     }
 
@@ -46,52 +46,57 @@ router.post('/signup', (request, response) => {
                username: account.username
            };
 
-           return response.json({ });
+           return response.json();
         });
     });
 });
 
-router.post('/signin', (req, res) => {
-    if(typeof req.body.password !== "string") {
-        return res.status(401).json({
-            error: "LOGIN FAILED",
-            code: 1
+router.post('/signin', (request, response) => {
+    const { username, password } = request.body;
+
+    if(typeof password !== "string") {
+        return response.json({
+            error: "The username or password field is empty"
         });
     }
 
-    Account.findOne({ username: req.body.username}, (err, account) => {
-        if(err) throw err;
+    Account.findOne({ username }, (err, account) => {
+        if(err) { 
+            logger.error(`${err}`);        
+            throw err;
+        }
 
-        // CHECK ACCOUNT EXISTANCY
+        const errorMessage = "Incorrect username or password";
+
         if(!account) {
-            return res.status(401).json({
-                error: "LOGIN FAILED",
-                code: 1
+            return response.json({ 
+                error: errorMessage  
             });
         }
 
-        if(!account.validateHash(req.body.password)) {
-            return res.status(401).json({
-                error: "LOGIN FAILED",
-                code: 1
+        if(!account.validateHash(password)) {
+            return response.json({
+                error: errorMessage 
             });
         }
 
-        req.session.loginInfo = {
+        request.session.loginInfo = {
             _id: account._id,
             username: account.username
         };
 
-        return res.json({ success: true });
+        return response.json();
     });
 });
 
-router.get('/getinfo', (req, res) =>{
+router.get('/getInfo', (req, res) => {
     if(typeof req.session.loginInfo === "undefined") {
-        return res.status(401).json({ error: 1 });
+        return res.json({ 
+            error: "Your session is expired, please log in again" 
+        });
     }
 
-    return res.json({ info: req.session.loginInfo });
+    return res.json({ username: req.session.loginInfo.username });
 });
 
 router.post('/logout', (req, res) => {

@@ -15,22 +15,23 @@ const Button = styled.div`
 class SignIn extends Component {
     handleLogin = (id, pw) => {
         return this.props.loginRequest(id, pw).then(
-            () => {
-                if (this.props.status === "SUCCESS") {
-                    // create session data
-                    let loginData = {
-                        isLoggedIn: true,
-                        username: id
-                    };
-
-                    document.cookie = 'key=' + btoa(JSON.stringify(loginData));
-
-                    this.props.history.push('/main');
-                    return true;
-                } else {
-                    this.props.openAlert({title: "Login", message: "Incorrect username or password"});
+            (error) => {
+                if (error) {
+                    this.props.openAlert({ 
+                        title: "Login", 
+                        message: error
+                    });
                     return false;
                 }
+
+                let loginData = JSON.stringify({
+                    isLoggedIn: true,
+                    username: id
+                });
+                document.cookie = 'key=' + btoa(loginData);
+
+                this.props.history.push('/main');
+                return true;
             }
         );
     }
@@ -56,7 +57,7 @@ const mapDispatchToProps = (dispatch) => {
         loginRequest: (id, pw) => {
             return dispatch(loginRequest(id, pw));
         },
-        openAlert: ({title, message}) => dispatch(openAlert({title, message}))
+        openAlert: (option) => dispatch(openAlert(option))
     };
 };
 

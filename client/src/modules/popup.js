@@ -36,6 +36,10 @@ export default handleActions({
         return state.update('openedPopups', openedPopups => openedPopups.push(popup));
     },
     [CLOSE]: (state, action) => {
-        return state.update('openedPopups', openedPopups => openedPopups.splice(openedPopups.size - 1, 1));
+        const index = state.get('openedPopups').size - 1;
+        const popup = state.get('openedPopups').get(index);
+        if (popup.hasOwnProperty('closeEvent')) popup.closeEvent();
+
+        return state.update('openedPopups', openedPopups => openedPopups.splice(index, 1));
     }
 }, initialState);

@@ -22,6 +22,11 @@ export function loginRequest(username, password) {
 
         return axios.post('/api/account/signin', { username, password })
             .then((response) => {
+                if (response.data.error) {
+                    dispatch(loginFailure());
+                    return response.data.error;
+                }
+
                 dispatch(loginSuccess(username));
             }).catch((error) => {
                 dispatch(loginFailure());
@@ -49,12 +54,16 @@ export function registerRequest(username, password) {
 
 export function getStatusRequest() {
     return (dispatch) => {
-        // inform Get Status API is starting
         dispatch(getStatus());
 
         return axios.get('/api/account/getInfo')
             .then((response) => {
-                dispatch(getStatusSuccess(response.data.info.username));
+                if (response.data.error) {
+                    dispatch(getStatusFailure());
+                    return response.data.error;
+                }
+
+                dispatch(getStatusSuccess(response.data.username));
             }).catch((error) => {
                 dispatch(getStatusFailure());
             });
@@ -104,12 +113,10 @@ export default handleActions({
         return state.setIn(['login', 'status'], 'WAITING');
     },
     [LOGIN_SUCCESS]: (state, action) => {
-        const username = action.payload;
-
         return state.setIn(['login', 'status'], 'SUCCESS')
                     .set('status', Map({
                         isLoggedIn: true,
-                        currentUser: username
+                        currentUser: action.payload
                     }));
     },
     [LOGIN_FAILURE]: (state, action) => {
@@ -117,16 +124,15 @@ export default handleActions({
     },
     [REGISTER]: (state, action) => {
         return state.set('register', Map({
-            status: 'WAITING',
-            error: -1
-        }));
+                        status: 'WAITING',
+                        error: -1
+                    }));
     },
     [REGISTER_SUCCESS]: (state, action) => {
-        const username = action.payload;
         return state.setIn(['login', 'status'], 'SUCCESS')
                     .set('status', Map({
                         isLoggedIn: true,
-                        currentUser: username
+                        currentUser: action.payload
                     }));
     },
     [REGISTER_FAILURE]: (state, action) => {
@@ -138,12 +144,10 @@ export default handleActions({
         return state.setIn(['status', 'isLoggedIn'], true);
     },
     [GET_STATUS_SUCCESS]: (state, action) => {
-        const username = action.payload;
-        
         return state.set('status', Map({
             valid: true,
             isLoggedIn: true,
-            currentUser: username
+            currentUser: action.payload
         }));
     },
     [GET_STATUS_FAILURE]: (state, action) => {

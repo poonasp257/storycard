@@ -17,7 +17,10 @@ class SignUp extends Component {
         return this.props.registerRequest(id, pw).then(
             (error) => {
                 if (error) {
-                    this.props.openAlert({title: "Register", message: error });
+                    this.props.openAlert({
+                        title: "Register", 
+                        message: error 
+                    });
                     return;
                 }
 
@@ -53,7 +56,7 @@ const mapDispatchToProps = (dispatch) => {
         registerRequest: (id, pw) => {
             return dispatch(registerRequest(id, pw));
         },
-        openAlert: ({title, message}) => dispatch(openAlert({title, message}))
+        openAlert: (option) => dispatch(openAlert(option))
     };
 };
 

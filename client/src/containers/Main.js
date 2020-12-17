@@ -46,7 +46,7 @@ class Main extends Component {
     constructor(props) {
         super(props);
 
-        this.socket = io.connect('http://localhost:8000');
+        this.socket = io.connect('http://localhost:9090');
     }
 
     handleLogin = () => {
@@ -70,19 +70,19 @@ class Main extends Component {
             }
 
             this.props.getStatusRequest().then(
-                () => {
+                (error) => {
                     if (!this.props.status.auth.get('valid')) {
-                        // logout the session
                         loginData = {
                             isLoggedIn: false,
                             username: ''
                         };
-                        
                         document.cookie = 'key=' + btoa(JSON.stringify(loginData));
 
-                        this.props.openAlert({title: "Storycard", message: "Your session is expired, please log in again" });
-
-                        window.location.href = "/signin";
+                        this.props.openAlert({ 
+                            title: "Storycard", 
+                            message: error,
+                            closeEvent: () => window.location.href = "/signin"
+                        });
                         reject(false);
                     }
 
@@ -101,19 +101,12 @@ class Main extends Component {
         );
     }
     
-    getItems = () => {
-        this.props.getItemsRequest().then(
-            () => {
-
-            });
-    }
-
     componentDidMount() {
         this.handleLogin().then(
             (success) => {
                 if (!success) return;
 
-                this.getItems();
+                this.props.getItemsRequest();
                 this.props.updateItems(this.socket);
             }
         );
@@ -161,7 +154,7 @@ const mapDispatchToProps = (dispatch) => {
             return dispatch(getItemsRequest());
         },
         updateItems: (socket) => dispatch(updateItems(socket)),
-        openAlert: ({title, message}) => dispatch(openAlert({title, message}))
+        openAlert: (option) => dispatch(openAlert(option))
     };
 };
 
