@@ -10,14 +10,6 @@
 **Hyun-Jee Kim, Byung-Chull bae  
 Jun-Young Lee, O-Neul, Hye-Rin Lee**
 
-# 목차 
-1. 서론
-    1. 진행 방식
-    2. 사용된 기술  
-    3. 라이브러리  
-1. 사용된 기술
-1. 라이센스
-
 # Tech
 ## Front-End
 HTML5, CSS3, React.js
