@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "axios": "^0.21.0",
+    "axios": "^0.21.1",
     "immutable": "^4.0.0-rc.12",
     "jquery": "^3.5.1",
     "list-react-files": "^0.2.0",
