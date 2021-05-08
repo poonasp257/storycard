@@ -7,7 +7,7 @@
     "immutable": "^4.0.0-rc.12",
     "jquery": "^3.5.1",
     "list-react-files": "^0.2.0",
-    "lodash": "^4.17.20",
+    "lodash": "^4.17.21",
     "prop-types": "^15.7.2",
     "react": "^17.0.1",
     "react-addons-update": "^15.6.3",
